@@ -20,14 +20,9 @@ public class ClinicController {
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.POST, value= "/service/clinic", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ClinicDto createClinic(@RequestBody List<ClinicDto> clinicDtos, HttpServletResponse response) throws Exception{
-
-        if (clinicDtos.size() > 1) {
-            throw new Exception("Sorry, unfortunately you can only add one clinic at a time.");
-        }
+    public ClinicDto createClinic(@RequestBody ClinicDto clinicDto, HttpServletResponse response) throws Exception{
 
         //Create new clinic
-        ClinicDto clinicDto = clinicDtos.get(0);
         Clinic clinic = new Clinic(clinicDto.getName(), clinicDto.getCode(), clinicDto.getEncryptedPassword(), clinicDto.getSalt());
         clinic = clinicService.save(clinic);
 
@@ -39,14 +34,9 @@ public class ClinicController {
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.PUT,value = "/service/clinic/{clinicId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ClinicDto updateClinic(@RequestBody List<ClinicDto> clinicDtos, @PathVariable Long clinicId) throws Exception {
-
-        if (clinicDtos.size() > 1) {
-            throw new Exception("Sorry, unfortunately you can only update one clinic at a time.");
-        }
+    public ClinicDto updateClinic(@RequestBody ClinicDto clinicDto, @PathVariable Long clinicId) throws Exception {
 
         // Retrieve the clinic entity with id clinicId
-        ClinicDto clinicDto = clinicDtos.get(0);
         Clinic clinic = clinicService.get(clinicId);
         if (clinic == null) {
             throw new Exception("A clinic with this identifier does not exist. Please check the url.");

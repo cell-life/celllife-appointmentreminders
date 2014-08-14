@@ -9,6 +9,8 @@
 
     <include file="db.changelog-clinic.xml" relativeToChangelogFile="true"/>
     <include file="db.changelog-patient.xml" relativeToChangelogFile="true"/>
+    <include file="db.changelog-appointment.xml" relativeToChangelogFile="true"/>
+    <include file="db.changelog-message.xml" relativeToChangelogFile="true"/>
 
     <!-- Cross Domain Constraints -->
 

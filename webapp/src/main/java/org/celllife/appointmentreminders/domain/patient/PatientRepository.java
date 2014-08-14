@@ -6,4 +6,6 @@ public interface PatientRepository extends PagingAndSortingRepository<Patient, L
 
     Iterable<Patient> findByClinicId(Long clinicId);
 
+    Iterable<Patient> findByPatientCodeAndClinicId(String patientCode, Long clinicId);
+
 }

@@ -2,7 +2,7 @@ package org.celllife.appointmentreminders.domain.clinic;
 
 import java.io.Serializable;
 
-public class ClinicDto implements Serializable{
+public class ClinicDto implements Serializable {
 
     private Long id;
 

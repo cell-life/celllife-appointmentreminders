@@ -1,5 +1,8 @@
 package org.celllife.appointmentreminders.domain.patient;
 
+import org.celllife.appointmentreminders.domain.exception.InvalidMsisdnException;
+import org.celllife.appointmentreminders.framework.util.MsisdnUtils;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -20,8 +23,13 @@ public class Patient implements Serializable {
     @GeneratedValue(strategy= GenerationType.TABLE, generator="PatientIdGen")
     private Long id;
 
+    @Basic(optional = false)
+    private String patientCode;
+
+    @Basic(optional = false)
     private Long clinicId;
 
+    @Basic(optional = false)
     private String msisdn;
 
     @Column(columnDefinition = "BIT", length = 1)
@@ -31,8 +39,14 @@ public class Patient implements Serializable {
 
     }
 
-    public Patient(Long clinicId, String msisdn, Boolean subscribed) {
+    public Patient(Long clinicId, String patientCode, String msisdn, Boolean subscribed) throws InvalidMsisdnException {
+
+        if (!MsisdnUtils.isValidMsisdn(msisdn)) {
+            throw new InvalidMsisdnException("The msisdn " + msisdn + " does not match the prescribed format.");
+        }
+
         this.clinicId = clinicId;
+        this.patientCode = patientCode;
         this.msisdn = msisdn;
         this.subscribed = subscribed;
     }
@@ -40,6 +54,7 @@ public class Patient implements Serializable {
     public PatientDto getPatientDto() {
         PatientDto patientDto = new PatientDto();
         patientDto.setId(this.getId());
+        patientDto.setPatientCode(this.getPatientCode());
         patientDto.setClinicId(this.getClinicId());
         patientDto.setMsisdn(this.getMsisdn());
         patientDto.setSubscribed(subscribed);
@@ -54,6 +69,14 @@ public class Patient implements Serializable {
         this.id = id;
     }
 
+    public String getPatientCode() {
+        return patientCode;
+    }
+
+    public void setPatientCode(String patientCode) {
+        this.patientCode = patientCode;
+    }
+
     public Long getClinicId() {
         return clinicId;
     }
@@ -66,7 +89,7 @@ public class Patient implements Serializable {
         return msisdn;
     }
 
-    public void setMsisdn(String msisdn) {
+    public void setMsisdn(String msisdn) throws InvalidMsisdnException {
         this.msisdn = msisdn;
     }
 

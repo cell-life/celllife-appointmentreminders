@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 @Controller
 public class PatientController {
@@ -23,25 +22,45 @@ public class PatientController {
     ClinicService clinicService;
 
     @ResponseBody
-    @RequestMapping(method = RequestMethod.POST, value= "/service/clinic/{clinicId}/patient", produces = MediaType.APPLICATION_JSON_VALUE)
-    public PatientDto createPatient(@RequestBody List<PatientDto> patientDtos, @PathVariable Long clinicId, HttpServletResponse response) throws Exception {
+    @RequestMapping(method = RequestMethod.POST, value= "/service/patient", produces = MediaType.APPLICATION_JSON_VALUE)
+    public PatientDto createPatient(@RequestBody PatientDto patientDto, @RequestParam(required = true) String clinicCode, HttpServletResponse response) throws Exception {
 
-        if (patientDtos.size() > 1) {
-            throw new Exception("Sorry, unfortunately you can only add one patient at a time.");
-        }
-
-        Clinic clinic = clinicService.get(clinicId);
+        Clinic clinic = clinicService.findClinicByCode(clinicCode);
         if (clinic == null) {
-            throw new Exception("Sorry, no clinic with id " + clinicId + " exists.");
+            throw new Exception("Sorry, no clinic with code " + clinicCode + " exists.");
         }
 
         //Create new patient
-        PatientDto patientDto = patientDtos.get(0);
-        Patient patient = new Patient(clinicId, patientDto.getMsisdn(), patientDto.getSubscribed());
+        Patient patient = new Patient(clinic.getId(), patientDto.getPatientCode(), patientDto.getMsisdn(), patientDto.getSubscribed());
         patient = patientService.save(patient);
 
         //Create data transfer object and send it back to the client
         response.setStatus(HttpServletResponse.SC_CREATED);
+        return patient.getPatientDto();
+
+    }
+
+    @ResponseBody
+    @RequestMapping(method = RequestMethod.PUT, value= "/service/patient", produces = MediaType.APPLICATION_JSON_VALUE)
+    public PatientDto updatePatient(@RequestBody PatientDto patientDto, @RequestParam(required = true) String clinicCode, @RequestParam(required = true) String patientCode, HttpServletResponse response) throws Exception {
+
+        //Create new patient
+        Patient patient = patientService.findByPatientCodeAndClinicCode(patientCode,clinicCode);
+        patient.setMsisdn(patientDto.getMsisdn());
+        patient.setSubscribed(patientDto.getSubscribed());
+        patient = patientService.save(patient);
+
+        //Create data transfer object and send it back to the client
+        response.setStatus(HttpServletResponse.SC_CREATED);
+        return patient.getPatientDto();
+
+    }
+
+    @ResponseBody
+    @RequestMapping(method = RequestMethod.GET, value = "/service/patient",  produces = MediaType.APPLICATION_JSON_VALUE)
+    public PatientDto getPatient(@RequestParam(required = true)  String patientCode, @RequestParam(required = true)  String clinicCode) throws Exception {
+
+        Patient patient = patientService.findByPatientCodeAndClinicCode(patientCode, clinicCode);
         return patient.getPatientDto();
 
     }

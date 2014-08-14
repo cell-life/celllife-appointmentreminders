@@ -3,15 +3,14 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
-    <changeSet author="dine@cell-life.org" id="patient-1">
-        <createTable tableName="patient">
+    <changeSet author="dine@cell-life.org" id="appointment-1">
+        <createTable tableName="appointment">
             <column name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="patient_code" type="VARCHAR(32)" />
-            <column name="clinic_id" type="BIGINT" />
-            <column name="msisdn" type="VARCHAR(16)" />
-            <column name="subscribed" type="BOOLEAN" />
+            <column name="patient_id" type="BIGINT" />
+            <column name="appointment_date" type="DATE" />
+            <column name="appointment_time" type="TIME" />
         </createTable>
     </changeSet>
 

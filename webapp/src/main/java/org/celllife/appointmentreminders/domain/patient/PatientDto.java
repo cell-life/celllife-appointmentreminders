@@ -4,6 +4,8 @@ public class PatientDto {
 
     private Long id;
 
+    private String patientCode;
+
     private Long clinicId;
 
     private String msisdn;
@@ -16,6 +18,14 @@ public class PatientDto {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getPatientCode() {
+        return patientCode;
+    }
+
+    public void setPatientCode(String patientCode) {
+        this.patientCode = patientCode;
     }
 
     public Long getClinicId() {

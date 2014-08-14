@@ -4,4 +4,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface ClinicRepository extends PagingAndSortingRepository<Clinic, Long> {
 
+    Iterable<Clinic> findByCode(String code);
+
 }

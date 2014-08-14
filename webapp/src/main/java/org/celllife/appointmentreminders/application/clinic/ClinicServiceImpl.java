@@ -3,6 +3,7 @@ package org.celllife.appointmentreminders.application.clinic;
 import org.apache.commons.collections.IteratorUtils;
 import org.celllife.appointmentreminders.domain.clinic.Clinic;
 import org.celllife.appointmentreminders.domain.clinic.ClinicRepository;
+import org.celllife.appointmentreminders.domain.exception.ClinicCodeExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +18,10 @@ public class ClinicServiceImpl implements ClinicService{
     ClinicRepository clinicRepository;
 
     @Override
-    public Clinic save(Clinic clinic) {
+    public Clinic save(Clinic clinic) throws ClinicCodeExistsException {
+        if ( (clinic.getId() == null) && (clinicRepository.findByCode(clinic.getCode()).iterator().hasNext() )) {
+            throw new ClinicCodeExistsException("A clinic with code " + clinic.getCode() + " already exists");
+        }
         return clinicRepository.save(clinic);
     }
 
@@ -30,6 +34,19 @@ public class ClinicServiceImpl implements ClinicService{
     public List<Clinic> getAllClinics() {
         List<Clinic> clinics = IteratorUtils.toList(clinicRepository.findAll().iterator());
         return clinics;
+    }
+
+    @Override
+    public Clinic findClinicByCode(String code) {
+
+        List<Clinic> clinics =  IteratorUtils.toList(clinicRepository.findAll().iterator());
+
+        if (clinics.size() == 0)  {
+            return  null;
+        } else {
+            return clinics.get(0);
+        }
+
     }
 
 }
