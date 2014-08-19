@@ -4,6 +4,7 @@ import org.celllife.appointmentreminders.application.clinic.ClinicService;
 import org.celllife.appointmentreminders.domain.clinic.Clinic;
 import org.celllife.appointmentreminders.domain.clinic.ClinicDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,9 @@ public class ClinicController {
     @Autowired
     ClinicService clinicService;
 
+    @Value("${external.base.url}")
+    String baseUrl;
+
     @ResponseBody
     @RequestMapping(method = RequestMethod.POST, value= "/service/clinic", produces = MediaType.APPLICATION_JSON_VALUE)
     public ClinicDto createClinic(@RequestBody ClinicDto clinicDto, HttpServletResponse response) throws Exception{
@@ -28,6 +32,7 @@ public class ClinicController {
 
         //Create data transfer object and send it back to the client
         response.setStatus(HttpServletResponse.SC_CREATED);
+        response.addHeader("Link", baseUrl + "/service/clinic/" + clinic.getId());
         return clinic.getClinicDto();
 
     }

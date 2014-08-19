@@ -34,15 +34,18 @@ public class Message implements Serializable {
 
     private String messageText;
 
+    private MessageType messageType;
+
     public Message() {
 
     }
 
-    public Message(Long appointmentId, Date messageDate, Date messageTime, String messageText) {
+    public Message(Long appointmentId, Date messageDate, Date messageTime, String messageText, MessageType messageType) {
         this.appointmentId = appointmentId;
         this.messageDate = messageDate;
         this.messageTime = messageTime;
         this.messageText = messageText;
+        this.messageType = messageType;
     }
 
     public MessageDto getMessageDto() {
@@ -51,6 +54,7 @@ public class Message implements Serializable {
         messageDto.setAppointmentId(this.getAppointmentId());
         messageDto.setMessageDate(DateUtil.DateToString(this.getMessageDate()));
         messageDto.setMessageTime(DateUtil.TimeToString(this.getMessageTime()));
+        messageDto.setMessageType(this.getMessageType());
         return messageDto;
     }
 
@@ -92,5 +96,13 @@ public class Message implements Serializable {
 
     public void setMessageText(String messageText) {
         this.messageText = messageText;
+    }
+
+    public MessageType getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(MessageType messageType) {
+        this.messageType = messageType;
     }
 }

@@ -6,6 +6,7 @@ import org.celllife.appointmentreminders.domain.clinic.Clinic;
 import org.celllife.appointmentreminders.domain.patient.Patient;
 import org.celllife.appointmentreminders.domain.patient.PatientDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class PatientController {
+
+    @Value("${external.base.url}")
+    String baseUrl;
 
     @Autowired
     PatientService patientService;
@@ -36,22 +40,22 @@ public class PatientController {
 
         //Create data transfer object and send it back to the client
         response.setStatus(HttpServletResponse.SC_CREATED);
+        response.addHeader("Link", baseUrl + "/service/patient/" + clinic.getId());
         return patient.getPatientDto();
 
     }
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.PUT, value= "/service/patient", produces = MediaType.APPLICATION_JSON_VALUE)
-    public PatientDto updatePatient(@RequestBody PatientDto patientDto, @RequestParam(required = true) String clinicCode, @RequestParam(required = true) String patientCode, HttpServletResponse response) throws Exception {
+    public PatientDto updatePatient(@RequestBody PatientDto patientDto, @RequestParam(required = true) String clinicCode, HttpServletResponse response) throws Exception {
 
         //Create new patient
-        Patient patient = patientService.findByPatientCodeAndClinicCode(patientCode,clinicCode);
+        Patient patient = patientService.findByPatientCodeAndClinicCode(patientDto.getPatientCode(),clinicCode);
         patient.setMsisdn(patientDto.getMsisdn());
         patient.setSubscribed(patientDto.getSubscribed());
         patient = patientService.save(patient);
 
         //Create data transfer object and send it back to the client
-        response.setStatus(HttpServletResponse.SC_CREATED);
         return patient.getPatientDto();
 
     }
