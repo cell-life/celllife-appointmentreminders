@@ -16,6 +16,8 @@ public class MessageDto implements Serializable {
 
     private MessageType messageType;
 
+    private MessageState messageState;
+
     public Long getId() {
         return id;
     }
@@ -62,5 +64,13 @@ public class MessageDto implements Serializable {
 
     public void setMessageType(MessageType messageType) {
         this.messageType = messageType;
+    }
+
+    public MessageState getMessageState() {
+        return messageState;
+    }
+
+    public void setMessageState(MessageState messageState) {
+        this.messageState = messageState;
     }
 }

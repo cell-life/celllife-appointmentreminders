@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+    <context:annotation-config/>
+
+    <util:properties id="quartzProperties" location="classpath:quartz.properties"/>
+
+    <bean id="qrtzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"
+          destroy-method="destroy">
+        <property name="dataSource" ref="dataSource" />
+        <property name="transactionManager" ref="transactionManager" />
+        <property name="schedulerName" value="mainScheduler"/>
+        <property name="exposeSchedulerInRepository" value="true"/>
+        <property name="autoStartup" value="true"/>
+        <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
+        <property name="quartzProperties" ref="quartzProperties"/>
+        <property name="taskExecutor" ref="quartzTaskExecutor"/>
+        <property name="jobDetails">
+            <list>
+                <ref bean="relativeCampaignJobRunner"/>
+                <ref bean="fixedCampaignJobRunner"/>
+            </list>
+        </property>
+        <property name="triggers">
+            <ref bean="retryMessagesTrigger"/>
+        </property>
+    </bean>
+
+    <bean id="quartzTaskExecutor"
+          class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="10"/>
+        <property name="maxPoolSize" value="50"/>
+        <property name="rejectedExecutionHandler">
+            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"/>
+        </property>
+        <qualifier value="quartzTaskExecutor"/>
+    </bean>
+
+    <!-- Triggers -->
+
+    <bean id="retryMessagesTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="group" value="backgroundServices"/>
+        <property name="jobDetail" ref="retryMessagesJob"/>
+        <!-- 60 seconds -->
+        <property name="startDelay" value="60000"/>
+        <!-- repeat every hour -->
+        <property name="repeatInterval" value="3600000"/>
+    </bean>
+
+    <!--Jobs-->
+
+    <bean name="fixedCampaignJobRunner" class="org.quartz.impl.JobDetailImpl">
+        <property name="durability" value="true"/>
+        <property name="requestsRecovery" value="true"/>
+        <property name="group" value="campaignJobs"/>
+        <property name="name" value="fixedCampaignJobRunner"/>
+        <property name="description" value="Job that handles fixed campaign messages."/>
+        <property name="jobClass" value="org.celllife.appointmentreminders.application.jobs.FixedCampaignJobRunner"/>
+    </bean>
+
+    <bean name="relativeCampaignJobRunner" class="org.quartz.impl.JobDetailImpl">
+        <property name="durability" value="true"/>
+        <property name="requestsRecovery" value="true"/>
+        <property name="group" value="campaignJobs"/>
+        <property name="name" value="relativeCampaignJobRunner"/>
+        <property name="description" value="Job that handles relative campaign messages."/>
+        <property name="jobClass" value="org.celllife.appointmentreminders.application.jobs.RelativeCampaignJobRunner"/>
+    </bean>
+
+    <bean name="retryMessagesJob" class="org.quartz.impl.JobDetailImpl">
+        <property name="durability" value="true"/>
+        <property name="group" value="backgroundServices"/>
+        <property name="name" value="retryMessagesJob"/>
+        <property name="jobClass"
+                  value="org.celllife.appointmentreminders.application.jobs.AppointmentReminderJobBean"/>
+        <property name="jobDataMap" ref="mapForRetryMessagesJob"/>
+    </bean>
+
+    <bean name="mapForRetryMessagesJob" class="org.quartz.JobDataMap">
+        <constructor-arg>
+            <map>
+                <entry key="beanName" value="backgroundServices"/>
+                <entry key="methodName" value="retryMessagesJob"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+</beans>

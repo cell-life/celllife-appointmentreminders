@@ -93,7 +93,7 @@ public class Patient implements Serializable {
         this.msisdn = msisdn;
     }
 
-    public Boolean getSubscribed() {
+    public Boolean isSubscribed() {
         return subscribed;
     }
 

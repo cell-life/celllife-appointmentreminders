@@ -26,11 +26,11 @@ public class Appointment implements Serializable {
     @Basic(optional=false)
     private Long patientId;
 
+    @Temporal(TemporalType.DATE)
     @Basic(optional=false)
     private Date appointmentDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(columnDefinition="TIME")
+    @Temporal(TemporalType.TIME)
     @Basic(optional=false)
     private Date appointmentTime;
 

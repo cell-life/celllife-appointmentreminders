@@ -17,7 +17,13 @@
 
     <changeSet id="message-2" author="dine@cell-life.org">
         <addColumn tableName="message">
-            <column name="message_type" type="INT"/>
+            <column name="message_type" type="VARCHAR(15)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="message-3" author="dine@cell-life.org">
+        <addColumn tableName="message">
+            <column name="message_state" type="VARCHAR(15)"/>
         </addColumn>
     </changeSet>
 

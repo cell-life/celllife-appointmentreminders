@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="communicateClient" class="org.celllife.mobilisr.client.impl.MobilisrClientImpl">
+    	<constructor-arg index="0" value="${communicate.api}" />
+    	<constructor-arg index="1" value="${communicate.username}" />
+    	<constructor-arg index="2" value="${communicate.password}" />
+    	<constructor-arg index="3"><ref bean="communicateValidatoryFactory" /></constructor-arg>
+    </bean>
+    
+    <bean id="communicateValidatoryFactory" class="org.celllife.mobilisr.api.validation.ValidatorFactoryImpl">
+    	<property name="countryRules">
+    		<list>
+    			<ref bean="communicateMsisdnRules"/>
+    		</list>
+    	</property>
+    </bean>
+    
+    <bean id="communicateMsisdnRules" class="org.celllife.mobilisr.api.validation.MsisdnRule">
+    	<constructor-arg name="name" value="southafrica"/>
+    	<constructor-arg name="prefix" value="${communicate.msisdnPrefix}"/>
+    	<constructor-arg name="validator" value="${communicate.msisdnRegex}"/>
+    </bean>
+
+</beans>

@@ -39,11 +39,15 @@ public class AppointmentController {
 
         Patient patient = patientService.findByPatientCodeAndClinicCode(clinicCode,patientCode);
 
-        Appointment appointment = new Appointment(patient.getId(),DateUtil.getDateFromString(appointmentDto.getAppointmentDate()),DateUtil.getTimeFromString(appointmentDto.getAppointmentTime()));
+        Appointment appointment = new Appointment(patient.getId(),DateUtil.getDateFromString(appointmentDto.getAppointmentDate()), DateUtil.getTimeFromString(appointmentDto.getAppointmentTime()));
         appointment = appointmentService.save(appointment);
 
         for (MessageDto messageDto : appointmentDto.getMessages()) {
-            Message message = new Message(appointment.getId(),DateUtil.getDateFromString(messageDto.getMessageDate()),DateUtil.getTimeFromString(messageDto.getMessageTime()),messageDto.getMessageText(),messageDto.getMessageType());
+            Message message = new Message(appointment.getId(),
+                    DateUtil.getDateFromString(messageDto.getMessageDate()),
+                    DateUtil.getTimeFromString(messageDto.getMessageTime()),
+                    messageDto.getMessageText(),
+                    messageDto.getMessageType());
             messageService.save(message);
         }
 

@@ -23,10 +23,7 @@
 
     <!-- Cell-Life -->
 
-    <logger name="org.celllife" level="TRACE">
-    	<appender-ref ref="STDOUT" />
-    	<appender-ref ref="FILE" />
-    </logger>
+    <logger name="org.celllife" level="TRACE" />
 
     <!-- Hibernate -->
 
@@ -48,7 +45,6 @@
 
 	<root level="WARN">
 		<appender-ref ref="STDOUT" />
-		<appender-ref ref="FILE" />
 	</root>
 
 </configuration>

@@ -4,6 +4,7 @@ import org.celllife.appointmentreminders.framework.util.DateUtil;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 
 @Entity
@@ -24,17 +25,21 @@ public class Message implements Serializable {
     @Basic(optional=false)
     private Long appointmentId;
 
+    @Temporal(TemporalType.DATE)
     @Basic(optional=false)
     private Date messageDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(columnDefinition="TIME")
+    @Temporal(TemporalType.TIME)
     @Basic(optional=false)
     private Date messageTime;
 
     private String messageText;
 
+    @Enumerated(EnumType.STRING)
     private MessageType messageType;
+
+    @Enumerated(EnumType.STRING)
+    private MessageState messageState;
 
     public Message() {
 
@@ -55,6 +60,7 @@ public class Message implements Serializable {
         messageDto.setMessageDate(DateUtil.DateToString(this.getMessageDate()));
         messageDto.setMessageTime(DateUtil.TimeToString(this.getMessageTime()));
         messageDto.setMessageType(this.getMessageType());
+        messageDto.setMessageState(this.messageState);
         return messageDto;
     }
 
@@ -104,5 +110,29 @@ public class Message implements Serializable {
 
     public void setMessageType(MessageType messageType) {
         this.messageType = messageType;
+    }
+
+    public MessageState getMessageState() {
+        return messageState;
+    }
+
+    public void setMessageState(MessageState messageState) {
+        this.messageState = messageState;
+    }
+
+    public Date getMessageDateTime() {
+        Calendar timeCalendar = Calendar.getInstance();
+        timeCalendar.setTime(getMessageTime());
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(getMessageDate());
+        calendar.set(Calendar.HOUR_OF_DAY,timeCalendar.get(Calendar.HOUR_OF_DAY));
+        calendar.set(Calendar.MINUTE,timeCalendar.get(Calendar.MINUTE));
+
+        return calendar.getTime();
+    }
+
+    public String getIdentifierString(){
+        return this.getClass().getName() + ":" + this.id;
     }
 }

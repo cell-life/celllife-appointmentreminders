@@ -7,4 +7,6 @@
 
     <context:component-scan base-package="org.celllife.appointmentreminders.application"/>
 
+    <import resource="../quartz/quartz-config.xml" />
+
 </beans>
