@@ -62,7 +62,7 @@ public class PatientServiceImpl implements PatientService {
 
         List<Clinic> clinics = IteratorUtils.toList(clinicRepository.findByCode(clinicCode).iterator());
         if (clinics.size() == 0) {
-            throw new ClinicCodeNonexistentException("No clinic with code " + clinicCode + "could be found.");
+            throw new ClinicCodeNonexistentException("No clinic with code " + clinicCode + " could be found.");
         }
         Clinic clinic = clinics.get(0);
 

@@ -13,6 +13,7 @@ import org.celllife.appointmentreminders.domain.exception.RequiredFieldIsNullExc
 import org.celllife.appointmentreminders.domain.message.Message;
 import org.celllife.appointmentreminders.domain.patient.Patient;
 import org.celllife.appointmentreminders.test.TestConfiguration;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ public class TestFixedCampaignJob extends TestConfiguration {
     @Autowired
     private MessageService messageService;
 
+    @Ignore
     @Test
     public void testSendMessagesForCampaign() throws ClinicCodeExistsException, InvalidMsisdnException, PatientCodeExistsException, RequiredFieldIsNullException {
 

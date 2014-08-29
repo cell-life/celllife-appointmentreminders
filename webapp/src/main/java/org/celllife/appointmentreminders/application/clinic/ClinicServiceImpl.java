@@ -39,7 +39,7 @@ public class ClinicServiceImpl implements ClinicService{
     @Override
     public Clinic findClinicByCode(String code) {
 
-        List<Clinic> clinics =  IteratorUtils.toList(clinicRepository.findAll().iterator());
+        List<Clinic> clinics =  IteratorUtils.toList(clinicRepository.findByCode(code).iterator());
 
         if (clinics.size() == 0)  {
             return  null;

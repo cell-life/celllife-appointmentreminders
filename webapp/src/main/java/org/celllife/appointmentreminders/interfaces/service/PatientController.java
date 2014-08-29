@@ -39,7 +39,7 @@ public class PatientController {
         patient = patientService.save(patient);
 
         //Create data transfer object and send it back to the client
-        response.setStatus(HttpServletResponse.SC_CREATED);
+        //response.setStatus(HttpServletResponse.SC_CREATED); //FIXME: the Mobilisr client (in iDart) throws an exception when it gets 201 Created
         response.addHeader("Link", baseUrl + "/service/patient/" + clinic.getId());
         return patient.getPatientDto();
 

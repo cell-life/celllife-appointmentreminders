@@ -41,6 +41,8 @@ public class Message implements Serializable {
     @Enumerated(EnumType.STRING)
     private MessageState messageState;
 
+    private Long communicateId;
+
     public Message() {
 
     }
@@ -118,6 +120,14 @@ public class Message implements Serializable {
 
     public void setMessageState(MessageState messageState) {
         this.messageState = messageState;
+    }
+
+    public Long getCommunicateId() {
+        return communicateId;
+    }
+
+    public void setCommunicateId(Long communicateId) {
+        this.communicateId = communicateId;
     }
 
     public Date getMessageDateTime() {

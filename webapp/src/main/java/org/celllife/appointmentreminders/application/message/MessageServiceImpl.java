@@ -30,24 +30,30 @@ public class MessageServiceImpl implements MessageService {
 
         // if the required fields are null, throw an error
         if ((message.getAppointmentId() == null) || (message.getMessageDate() == null) || (message.getMessageTime() == null)) {
-
             throw new RequiredFieldIsNullException("AppointmentId, MessageDate and MessageTime must all be not null.");
+        }
 
         // if a message with this date and time exists for this appointment, simply update it
-        } else if ((message.getId() == null) && messageExists(message.getAppointmentId(), message.getMessageDate(), message.getMessageTime())) {
+        if ((message.getId() == null) && messageExists(message.getAppointmentId(), message.getMessageDate(), message.getMessageTime())) {
 
             Message oldMessage = findByAppointmentIdAndDateTimeStamp(message.getAppointmentId(), message.getMessageDate(), message.getMessageTime()).get(0);
             oldMessage.setMessageText(message.getMessageText());
             oldMessage.setMessageType(message.getMessageType());
-            return messageRepository.save(oldMessage);
+            message = messageRepository.save(oldMessage);
 
-        // otherwise save the new message
-        } else {
-
-            if (message.getMessageState() == null) {
-                message.setMessageState(MessageState.SCHEDULED);
-            }
+        } else { // otherwise save the new message
             message = messageRepository.save(message);
+        }
+
+        if (message.getMessageState() == null) {
+            message.setMessageState(MessageState.SCHEDULED);
+        }
+        if (message.getMessageText() == null) {
+            message.setMessageText("Empty Message");
+        }
+        message = messageRepository.save(message);
+
+        if (message.getMessageDateTime().after(new Date())) {
 
             try {
                 quartzService.scheduleOrUpdateMessageJob(message);
@@ -55,9 +61,10 @@ public class MessageServiceImpl implements MessageService {
                 log.error("Could not schedule message with id {0}. Reason: {1}", message.getId(), e.getMessage());
             }
 
-            return message;
-
         }
+
+        return message;
+
     }
 
     @Override

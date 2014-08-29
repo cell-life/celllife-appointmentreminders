@@ -180,7 +180,7 @@ public class QuartzServiceImpl implements QuartzService {
             log.debug("Message: {} scheduled to run at {}", message.getId(), scheduledDate);
         }
         catch (SchedulerException e) {
-            throw new AppointmentRemindersException("Error scheduling campaign. Cause: " + e.getMessage());
+            throw new AppointmentRemindersException("Error scheduling message. Cause: " + e.getMessage());
         }
     }
 

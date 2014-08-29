@@ -5,6 +5,6 @@ import org.celllife.mobilisr.client.exception.RestCommandException;
 
 public interface CommunicateService {
 
-    public void sendOneSms(Message message) throws RestCommandException;
+    public Long sendOneSms(Message message) throws RestCommandException;
 
 }

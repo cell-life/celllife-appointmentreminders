@@ -33,7 +33,8 @@ public class CommunicateServiceImpl implements CommunicateService {
     @Autowired
     private MobilisrClient communicateClient;
 
-    public void sendOneSms(Message message) throws RestCommandException {
+    @Override
+    public Long sendOneSms(Message message) throws RestCommandException {
 
         List<MessageDto> messageDtoList = new ArrayList<>();
         MessageDto messageDto = new MessageDto();
@@ -45,11 +46,6 @@ public class CommunicateServiceImpl implements CommunicateService {
 
         Appointment appointment = appointmentService.get(message.getAppointmentId());
         Patient patient = patientService.get(appointment.getPatientId());
-
-        if (!patient.isSubscribed()) {
-             log.debug("Not sending message to patient " + patient.getId() + " because patient is not subscribed.");
-             return;
-        }
 
         List<ContactDto> contactDtoList = new ArrayList<>();
         ContactDto contactDto = new ContactDto();
@@ -64,7 +60,7 @@ public class CommunicateServiceImpl implements CommunicateService {
         campaignDto.setDuration(1);
         campaignDto.setTimesPerDay(1);
 
-        communicateClient.getCampaignService().createNewCampaign(campaignDto);
+        return communicateClient.getCampaignService().createNewCampaign(campaignDto);
 
     }
 

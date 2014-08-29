@@ -35,28 +35,49 @@ public class FixedCampaignJob {
     @Autowired
     private CommunicateService communicateService;
 
+    @Autowired
+    private AppointmentService appointmentService;
+
+    @Autowired
+    private PatientService patientService;
+
 	protected void sendMessages(Long messageId) {
 
         Message message = messageService.getMessage(messageId);
 
         log.info("Now sending message with ID " + messageId);
 
+        Appointment appointment = appointmentService.get(message.getAppointmentId());
+        Patient patient = patientService.get(appointment.getPatientId());
+
+        if (!patient.isSubscribed()) {
+            log.debug("Not sending message to patient " + patient.getId() + " because patient is not subscribed.");
+            return;
+        } else if (message.getMessageState() == MessageState.SENT) {
+            log.debug("Not sending message to patient " + patient.getId() + " because message has already been sent.");
+            return;
+        }
+
         try {
-            communicateService.sendOneSms(message);
+
+            Long communicateId = communicateService.sendOneSms(message);
+            message.setMessageState(MessageState.SENT);
+            message.setCommunicateId(communicateId);
+            try {
+                messageService.save(message);
+            } catch (RequiredFieldIsNullException e) {
+                log.warn("Could not save message with ID " + message.getId() + ". Reason: " + e.getMessage());
+            }
+
         } catch (RestCommandException e1) {
+
             message.setMessageState(MessageState.ERROR);
+            log.warn("Could not send message with ID " + messageId + ". Reason: " + e1.getMessage());
             try {
                 messageService.save(message);
             } catch (RequiredFieldIsNullException e2) {
                 log.warn("Could not save message with ID " + message.getId() + ". Reason: " + e2.getMessage());
             }
-        }
-
-        message.setMessageState(MessageState.SENT);
-        try {
-            messageService.save(message);
-        } catch (RequiredFieldIsNullException e) {
-            log.warn("Could not save message with ID " + message.getId() + ". Reason: " + e.getMessage());
         }
 
     }

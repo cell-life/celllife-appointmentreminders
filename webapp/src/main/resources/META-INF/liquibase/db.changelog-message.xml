@@ -27,4 +27,10 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="message-4" author="dine@cell-life.org">
+        <addColumn tableName="message">
+            <column name="communicate_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
