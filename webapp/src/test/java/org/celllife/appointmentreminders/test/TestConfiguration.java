@@ -7,7 +7,7 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
         "classpath:/META-INF/spring/spring-aop.xml",
         "classpath:/META-INF/spring/spring-application.xml",
         "classpath:/META-INF/spring/spring-cache.xml",
-        "classpath:/META-INF/spring/spring-config.xml",
+        "classpath:/META-INF/spring/spring-config-test.xml",
         "classpath:/META-INF/spring/spring-domain.xml",
         "classpath:/META-INF/spring/spring-dozer.xml",
         "classpath:/META-INF/spring/spring-smooks.xml",
