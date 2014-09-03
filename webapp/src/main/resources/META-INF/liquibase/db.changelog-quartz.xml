@@ -19,13 +19,13 @@
             DROP TABLE IF EXISTS QRTZ_CALENDARS;
         </sql>
         <createTable tableName="QRTZ_JOB_DETAILS" >
-            <column name="SCHED_NAME" type="VARCHAR(120)" >
+            <column name="SCHED_NAME" type="VARCHAR(63)" >
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="JOB_NAME" type="VARCHAR(200)" >
-                <constraints nullable="false" primaryKey="true" />
+            <column name="JOB_NAME" type="VARCHAR(63)" >
+                <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="JOB_GROUP" type="VARCHAR(200)" >
+            <column name="JOB_GROUP" type="VARCHAR(63)" >
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="DESCRIPTION" type="VARCHAR(250)" />
@@ -47,24 +47,23 @@
             <column name="JOB_DATA" type="BLOB" />
         </createTable>
 
-
         <createTable tableName="QRTZ_TRIGGERS" >
-            <column name="SCHED_NAME" type="VARCHAR(120)">
+            <column name="SCHED_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="TRIGGER_NAME" type="VARCHAR(200)">
+            <column name="TRIGGER_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="TRIGGER_GROUP" type="VARCHAR(200)">
+            <column name="TRIGGER_GROUP" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="JOB_NAME" type="VARCHAR(200)">
+            <column name="JOB_NAME" type="VARCHAR(127)">
                 <constraints nullable="false"/>
             </column>
-            <column name="JOB_GROUP" type="VARCHAR(200)">
+            <column name="JOB_GROUP" type="VARCHAR(127)">
                 <constraints nullable="false"/>
             </column>
-            <column name="DESCRIPTION" type="VARCHAR(250)"/>
+            <column name="DESCRIPTION" type="VARCHAR(127)"/>
             <column name="NEXT_FIRE_TIME" type="BIGINT"/>
             <column name="PREV_FIRE_TIME" type="BIGINT"/>
             <column name="PRIORITY" type="INT"/>
@@ -78,7 +77,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="END_TIME" type="BIGINT"/>
-            <column name="CALENDAR_NAME" type="VARCHAR(200)"/>
+            <column name="CALENDAR_NAME" type="VARCHAR(127)"/>
             <column name="MISFIRE_INSTR" type="SMALLINT"/>
             <column name="JOB_DATA" type="BLOB"/>
 
@@ -91,13 +90,13 @@
                                  referencedTableName="QRTZ_JOB_DETAILS"/>
 
         <createTable tableName="QRTZ_SIMPLE_TRIGGERS">
-            <column name="SCHED_NAME" type="VARCHAR(120)">
+            <column name="SCHED_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="TRIGGER_NAME" type="VARCHAR(200)">
+            <column name="TRIGGER_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="TRIGGER_GROUP" type="VARCHAR(200)">
+            <column name="TRIGGER_GROUP" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="REPEAT_COUNT" type="BIGINT">
@@ -118,13 +117,13 @@
                                  referencedTableName="QRTZ_TRIGGERS"/>
 
         <createTable tableName="QRTZ_CRON_TRIGGERS">
-            <column name="SCHED_NAME" type="VARCHAR(120)">
+            <column name="SCHED_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="TRIGGER_NAME" type="VARCHAR(200)">
+            <column name="TRIGGER_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="TRIGGER_GROUP" type="VARCHAR(200)">
+            <column name="TRIGGER_GROUP" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true" />
             </column>
             <column name="CRON_EXPRESSION" type="VARCHAR(200)">
@@ -140,13 +139,13 @@
                                  referencedTableName="QRTZ_TRIGGERS"/>
 
         <createTable tableName="QRTZ_SIMPROP_TRIGGERS" >
-            <column name="SCHED_NAME" type="VARCHAR(120)">
+            <column name="SCHED_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="TRIGGER_NAME" type="VARCHAR(200)">
+            <column name="TRIGGER_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="TRIGGER_GROUP" type="VARCHAR(200)">
+            <column name="TRIGGER_GROUP" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true" />
             </column>
             <column name="STR_PROP_1" type="VARCHAR(512)" />
@@ -169,13 +168,13 @@
                                  referencedTableName="QRTZ_TRIGGERS"/>
 
         <createTable tableName="QRTZ_BLOB_TRIGGERS">
-            <column name="SCHED_NAME" type="VARCHAR(120)">
+            <column name="SCHED_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="TRIGGER_NAME" type="VARCHAR(200)">
+            <column name="TRIGGER_NAME" type="VARCHAR(127)">
                 <constraints nullable="false"/>
             </column>
-            <column name="TRIGGER_GROUP" type="VARCHAR(200)">
+            <column name="TRIGGER_GROUP" type="VARCHAR(127)">
                 <constraints nullable="false"/>
             </column>
             <column name="BLOB_DATA" type="BLOB"/>
@@ -284,13 +283,13 @@
             DROP TABLE IF EXISTS QRTZ_CALENDARS;
         </sql>
         <createTable tableName="QRTZ_JOB_DETAILS" >
-            <column name="SCHED_NAME" type="VARCHAR(120)" >
+            <column name="SCHED_NAME" type="VARCHAR(63)" >
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="JOB_NAME" type="VARCHAR(200)" >
+            <column name="JOB_NAME" type="VARCHAR(63)" >
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="JOB_GROUP" type="VARCHAR(200)" >
+            <column name="JOB_GROUP" type="VARCHAR(63)" >
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="DESCRIPTION" type="VARCHAR(250)" />
@@ -314,13 +313,13 @@
 
 
         <createTable tableName="QRTZ_TRIGGERS" >
-            <column name="SCHED_NAME" type="VARCHAR(120)">
+            <column name="SCHED_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="TRIGGER_NAME" type="VARCHAR(200)">
+            <column name="TRIGGER_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="TRIGGER_GROUP" type="VARCHAR(200)">
+            <column name="TRIGGER_GROUP" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="JOB_NAME" type="VARCHAR(200)">
@@ -356,13 +355,13 @@
                                  referencedTableName="QRTZ_JOB_DETAILS"/>
 
         <createTable tableName="QRTZ_SIMPLE_TRIGGERS">
-            <column name="SCHED_NAME" type="VARCHAR(120)">
+            <column name="SCHED_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="TRIGGER_NAME" type="VARCHAR(200)">
+            <column name="TRIGGER_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="TRIGGER_GROUP" type="VARCHAR(200)">
+            <column name="TRIGGER_GROUP" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="REPEAT_COUNT" type="BIGINT">
@@ -383,13 +382,13 @@
                                  referencedTableName="QRTZ_TRIGGERS"/>
 
         <createTable tableName="QRTZ_CRON_TRIGGERS">
-            <column name="SCHED_NAME" type="VARCHAR(120)">
+            <column name="SCHED_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="TRIGGER_NAME" type="VARCHAR(200)">
+            <column name="TRIGGER_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="TRIGGER_GROUP" type="VARCHAR(200)">
+            <column name="TRIGGER_GROUP" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true" />
             </column>
             <column name="CRON_EXPRESSION" type="VARCHAR(200)">
@@ -405,13 +404,13 @@
                                  referencedTableName="QRTZ_TRIGGERS"/>
 
         <createTable tableName="QRTZ_SIMPROP_TRIGGERS" >
-            <column name="SCHED_NAME" type="VARCHAR(120)">
+            <column name="SCHED_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="TRIGGER_NAME" type="VARCHAR(200)">
+            <column name="TRIGGER_NAME" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="TRIGGER_GROUP" type="VARCHAR(200)">
+            <column name="TRIGGER_GROUP" type="VARCHAR(63)">
                 <constraints nullable="false" primaryKey="true" />
             </column>
             <column name="STR_PROP_1" type="VARCHAR(512)" />
