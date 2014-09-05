@@ -33,4 +33,10 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="message-5" author="dine@cell-life.org">
+        <addColumn tableName="message">
+            <column name="retry_attempts" type="INT" value="0"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

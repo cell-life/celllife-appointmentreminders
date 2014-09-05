@@ -8,4 +8,6 @@ public interface MessageRepository extends PagingAndSortingRepository<Message, L
 
     Iterable<Message> findByAppointmentIdAndMessageDateAndMessageTime(Long patientId, Date messageDate, Date messageTime);
 
+    Iterable<Message> findByMessageStateAndMessageDate(MessageState messageState, Date messageDate);
+
 }

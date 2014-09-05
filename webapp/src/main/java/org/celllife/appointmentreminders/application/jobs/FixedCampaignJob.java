@@ -9,18 +9,11 @@ import org.celllife.appointmentreminders.domain.message.Message;
 import org.celllife.appointmentreminders.domain.message.MessageState;
 import org.celllife.appointmentreminders.domain.patient.Patient;
 import org.celllife.appointmentreminders.integration.CommunicateService;
-import org.celllife.mobilisr.api.rest.CampaignDto;
-import org.celllife.mobilisr.api.rest.ContactDto;
-import org.celllife.mobilisr.api.rest.MessageDto;
-import org.celllife.mobilisr.client.MobilisrClient;
 import org.celllife.mobilisr.client.exception.RestCommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component("fixedCampaignJob")
 public class FixedCampaignJob {
@@ -71,7 +64,7 @@ public class FixedCampaignJob {
 
         } catch (RestCommandException e1) {
 
-            message.setMessageState(MessageState.ERROR);
+            message.setMessageState(MessageState.FAILED);
             log.warn("Could not send message with ID " + messageId + ". Reason: " + e1.getMessage());
             try {
                 messageService.save(message);

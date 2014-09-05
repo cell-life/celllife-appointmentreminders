@@ -41,6 +41,8 @@ public class Message implements Serializable {
     @Enumerated(EnumType.STRING)
     private MessageState messageState;
 
+    private Integer retryAttempts;
+
     private Long communicateId;
 
     public Message() {
@@ -128,6 +130,14 @@ public class Message implements Serializable {
 
     public void setCommunicateId(Long communicateId) {
         this.communicateId = communicateId;
+    }
+
+    public Integer getRetryAttempts() {
+        return retryAttempts;
+    }
+
+    public void setRetryAttempts(Integer retryAttempts) {
+        this.retryAttempts = retryAttempts;
     }
 
     public Date getMessageDateTime() {

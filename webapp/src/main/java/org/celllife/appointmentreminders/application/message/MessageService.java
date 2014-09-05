@@ -2,6 +2,7 @@ package org.celllife.appointmentreminders.application.message;
 
 import org.celllife.appointmentreminders.domain.exception.RequiredFieldIsNullException;
 import org.celllife.appointmentreminders.domain.message.Message;
+import org.celllife.appointmentreminders.domain.message.MessageState;
 
 import java.util.Date;
 import java.util.List;
@@ -40,5 +41,13 @@ public interface MessageService {
      * @return
      */
     List<Message> findByAppointmentIdAndDateTimeStamp(Long appointmentId, Date messageDate, Date messageTime);
+
+    /**
+     * Finds messages by message state and message date.
+     * @param messageState
+     * @param messageDate
+     * @return
+     */
+    List<Message> findByMessageStateAndMessageDate(MessageState messageState, Date messageDate);
 
 }

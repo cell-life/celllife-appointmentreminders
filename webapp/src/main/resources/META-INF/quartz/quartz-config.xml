@@ -23,7 +23,6 @@
         <property name="taskExecutor" ref="quartzTaskExecutor"/>
         <property name="jobDetails">
             <list>
-                <ref bean="relativeCampaignJobRunner"/>
                 <ref bean="fixedCampaignJobRunner"/>
             </list>
         </property>
@@ -64,19 +63,10 @@
         <property name="jobClass" value="org.celllife.appointmentreminders.application.jobs.FixedCampaignJobRunner"/>
     </bean>
 
-    <bean name="relativeCampaignJobRunner" class="org.quartz.impl.JobDetailImpl">
-        <property name="durability" value="true"/>
-        <property name="requestsRecovery" value="true"/>
-        <property name="group" value="campaignJobs"/>
-        <property name="name" value="relativeCampaignJobRunner"/>
-        <property name="description" value="Job that handles relative campaign messages."/>
-        <property name="jobClass" value="org.celllife.appointmentreminders.application.jobs.RelativeCampaignJobRunner"/>
-    </bean>
-
     <bean name="retryMessagesJob" class="org.quartz.impl.JobDetailImpl">
         <property name="durability" value="true"/>
         <property name="group" value="backgroundServices"/>
-        <property name="name" value="retryMessagesJob"/>
+        <property name="name" value="retryFailedMessages"/>
         <property name="jobClass"
                   value="org.celllife.appointmentreminders.application.jobs.AppointmentReminderJobBean"/>
         <property name="jobDataMap" ref="mapForRetryMessagesJob"/>
@@ -86,7 +76,7 @@
         <constructor-arg>
             <map>
                 <entry key="beanName" value="backgroundServices"/>
-                <entry key="methodName" value="retryMessagesJob"/>
+                <entry key="methodName" value="retryFailedMessages"/>
             </map>
         </constructor-arg>
     </bean>

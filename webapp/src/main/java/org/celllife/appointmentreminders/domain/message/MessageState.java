@@ -5,6 +5,6 @@ public enum MessageState {
     SCHEDULED,
     UNSCHEDULED,
     SENT,
-    ERROR
+    FAILED
 
 }

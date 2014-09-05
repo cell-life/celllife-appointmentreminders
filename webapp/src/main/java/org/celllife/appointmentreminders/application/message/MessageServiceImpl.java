@@ -82,4 +82,9 @@ public class MessageServiceImpl implements MessageService {
         return IteratorUtils.toList(messageRepository.findByAppointmentIdAndMessageDateAndMessageTime(appointmentId, messageDate, messageTime).iterator());
     }
 
+    @Override
+    public List<Message> findByMessageStateAndMessageDate(MessageState messageState, Date messageDate) {
+        return IteratorUtils.toList(messageRepository.findByMessageStateAndMessageDate(messageState, messageDate).iterator());
+    }
+
 }
