@@ -39,4 +39,10 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="message-6" author="dine@cell-life.org">
+        <addColumn tableName="message">
+            <column name="message_sent" type="DATETIME"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

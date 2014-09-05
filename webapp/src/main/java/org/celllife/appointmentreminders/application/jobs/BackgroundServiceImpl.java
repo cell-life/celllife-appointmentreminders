@@ -7,7 +7,6 @@ import org.celllife.appointmentreminders.domain.message.Message;
 import org.celllife.appointmentreminders.domain.message.MessageState;
 import org.celllife.appointmentreminders.framework.util.DateUtil;
 import org.celllife.appointmentreminders.integration.CommunicateService;
-import org.celllife.mobilisr.client.exception.RestCommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,7 @@ public class BackgroundServiceImpl implements BackgroundService {
 
         log.debug("Checking for failed messages to retry.");
 
-        List<Message> messagesToRetry = messageService.findByMessageStateAndMessageDate(MessageState.FAILED,new Date());
+        List<Message> messagesToRetry = messageService.findByMessageStateAndMessageDate(MessageState.FAILED, new Date());
 
         // if it is too late to retry the message, return
         if (isTooLate())
@@ -51,9 +50,12 @@ public class BackgroundServiceImpl implements BackgroundService {
                 Long returnedId = communicateService.sendOneSms(message);
                 message.setCommunicateId(returnedId);
                 message.setMessageState(MessageState.SENT);
-            } catch (RestCommandException e) {
+                message.setMessageSent(new Date());
+            } catch (Exception e) {
                 message.setMessageState(MessageState.FAILED);
-            } finally {
+                log.warn("Could not send message with id " + message.getId() + ". Reason: " + e.getLocalizedMessage());
+            }
+            finally {
                 message.setRetryAttempts(message.getRetryAttempts() + 1);
                 try {
                     messageService.save(message);

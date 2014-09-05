@@ -45,6 +45,9 @@ public class Message implements Serializable {
 
     private Long communicateId;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date messageSent;
+
     public Message() {
 
     }
@@ -138,6 +141,14 @@ public class Message implements Serializable {
 
     public void setRetryAttempts(Integer retryAttempts) {
         this.retryAttempts = retryAttempts;
+    }
+
+    public Date getMessageSent() {
+        return messageSent;
+    }
+
+    public void setMessageSent(Date messageSent) {
+        this.messageSent = messageSent;
     }
 
     public Date getMessageDateTime() {

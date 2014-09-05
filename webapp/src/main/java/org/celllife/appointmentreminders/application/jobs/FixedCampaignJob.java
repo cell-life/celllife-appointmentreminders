@@ -9,11 +9,12 @@ import org.celllife.appointmentreminders.domain.message.Message;
 import org.celllife.appointmentreminders.domain.message.MessageState;
 import org.celllife.appointmentreminders.domain.patient.Patient;
 import org.celllife.appointmentreminders.integration.CommunicateService;
-import org.celllife.mobilisr.client.exception.RestCommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
 
 @Component("fixedCampaignJob")
 public class FixedCampaignJob {
@@ -56,16 +57,17 @@ public class FixedCampaignJob {
             Long communicateId = communicateService.sendOneSms(message);
             message.setMessageState(MessageState.SENT);
             message.setCommunicateId(communicateId);
+            message.setMessageSent(new Date());
             try {
                 messageService.save(message);
             } catch (RequiredFieldIsNullException e) {
                 log.warn("Could not save message with ID " + message.getId() + ". Reason: " + e.getMessage());
             }
 
-        } catch (RestCommandException e1) {
+        } catch (Exception e1) {
 
             message.setMessageState(MessageState.FAILED);
-            log.warn("Could not send message with ID " + messageId + ". Reason: " + e1.getMessage());
+            log.warn("Could not send message with ID " + messageId + ". Reason: " + e1.getLocalizedMessage());
             try {
                 messageService.save(message);
             } catch (RequiredFieldIsNullException e2) {
