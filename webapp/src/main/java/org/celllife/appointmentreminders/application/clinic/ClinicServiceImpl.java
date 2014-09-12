@@ -32,6 +32,7 @@ public class ClinicServiceImpl implements ClinicService{
 
     @Override
     public List<Clinic> getAllClinics() {
+        @SuppressWarnings("unchecked")
         List<Clinic> clinics = IteratorUtils.toList(clinicRepository.findAll().iterator());
         return clinics;
     }
@@ -39,9 +40,10 @@ public class ClinicServiceImpl implements ClinicService{
     @Override
     public Clinic findClinicByCode(String code) {
 
+        @SuppressWarnings("unchecked")
         List<Clinic> clinics =  IteratorUtils.toList(clinicRepository.findByCode(code).iterator());
 
-        if (clinics.size() == 0)  {
+        if (clinics.isEmpty())  {
             return  null;
         } else {
             return clinics.get(0);
