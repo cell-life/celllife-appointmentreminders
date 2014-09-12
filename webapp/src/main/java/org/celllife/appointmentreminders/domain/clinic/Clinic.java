@@ -31,6 +31,11 @@ public class Clinic implements Serializable {
     public Clinic() {
 
     }
+    
+    public Clinic(String name, String code) {
+        this.name = name;
+        this.code = code;
+    }
 
     public Clinic(String name, String code, String encryptedPassword, String salt) {
         this.name = name;
