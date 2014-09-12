@@ -73,17 +73,24 @@ public class PatientController {
     @RequestMapping(method = RequestMethod.PUT, value= "/service/patient", produces = MediaType.APPLICATION_JSON_VALUE)
     public PatientDto updatePatient(@RequestBody PatientDto patientDto, @RequestParam(required = true) String clinicCode, HttpServletResponse response) {
 
-        //TODO: if patient doesn't exist, create it
-
-        //Create new patient
         Patient patient = null;
+        // try and fetch an existing patient
         try {
             patient = patientService.findByPatientCodeAndClinicCode(patientDto.getPatientCode(),clinicCode);
-        } catch (ClinicCodeNonexistentException | PatientCodeNonexistentException e) {
-            log.warn(e.getMessage());
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return null;
+        } catch (ClinicCodeNonexistentException | PatientCodeNonexistentException e) { // If the patient does not exist, create a new one.
+
+            log.info("A patient with clinic code " + clinicCode + " and patient code " + patientDto.getPatientCode() + " does not exist. System will create a new one.");
+            Clinic clinic = clinicService.findClinicByCode(clinicCode);
+            try {
+                patient =  new Patient(clinic.getId(), patientDto.getPatientCode(), patientDto.getMsisdn(), patientDto.getSubscribed());
+            } catch (InvalidMsisdnException e1) {
+                log.warn(e.getMessage());
+                response.setStatus(SC_UNPROCESSABLE_ENTITY);
+                return null;
+            }
         }
+
+        // try and save the updated patient
         try {
             patient.setMsisdn(patientDto.getMsisdn());
             patient.setSubscribed(patientDto.getSubscribed());

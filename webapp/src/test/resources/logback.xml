@@ -41,22 +41,6 @@
 
     <logger name="liquibase" level="WARN" />
 
-    <!-- Quartz -->
-
-    <logger name="org.quartz" level="WARN" />
-
-    <!-- Smooks -->
-
-    <logger name="org.milyn" level="WARN" />
-
-    <!-- ehcache -->
-
-    <logger name="net.sf.ehcache" level="WARN" />
-
-    <!-- Dozer -->
-
-    <logger name="org.dozer" level="WARN" />
-
     <!-- Root -->
 
 	<root level="WARN">
