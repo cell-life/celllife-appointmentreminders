@@ -61,17 +61,17 @@ public class FixedCampaignJob {
             try {
                 messageService.save(message);
             } catch (RequiredFieldIsNullException e) {
-                log.warn("Could not save message with ID " + message.getId() + ". Reason: " + e.getMessage());
+                log.warn("Could not save message with ID " + message.getId() + ". Reason: " + e.getMessage(), e);
             }
 
         } catch (Exception e1) {
 
             message.setMessageState(MessageState.FAILED);
-            log.warn("Could not send message with ID " + messageId + ". Reason: " + e1.getLocalizedMessage());
+            log.warn("Could not send message with ID " + messageId + ". Reason: " + e1.getMessage(), e1);
             try {
                 messageService.save(message);
             } catch (RequiredFieldIsNullException e2) {
-                log.warn("Could not save message with ID " + message.getId() + ". Reason: " + e2.getMessage());
+                log.warn("Could not save message with ID " + message.getId() + ". Reason: " + e2.getMessage(), e2);
             }
         }
 

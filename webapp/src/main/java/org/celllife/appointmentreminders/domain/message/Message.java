@@ -46,9 +46,9 @@ public class Message implements Serializable {
     private MessageType messageType;
 
     @Enumerated(EnumType.STRING)
-    private MessageState messageState;
+    private MessageState messageState = MessageState.NEW;
 
-    private Integer retryAttempts;
+    private Integer retryAttempts = 0;
 
     private Long communicateId;
 
@@ -252,6 +252,15 @@ public class Message implements Serializable {
      */
     public void setMessageSent(Date messageSent) {
         this.messageSent = messageSent;
+    }
+
+    public void increaseRetryCount() {
+        if (this.getRetryAttempts() == null) {
+            this.setRetryAttempts(1);
+        }
+        else {
+            this.setRetryAttempts(getRetryAttempts() + 1);
+        }
     }
 
     /**

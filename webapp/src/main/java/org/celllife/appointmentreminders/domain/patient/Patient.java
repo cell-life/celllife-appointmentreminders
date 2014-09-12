@@ -37,7 +37,7 @@ public class Patient implements Serializable {
     private String msisdn;
 
     @Column(columnDefinition = "BIT", length = 1)
-    private Boolean subscribed;
+    private Boolean subscribed = Boolean.FALSE;
 
     /**
      * Default constructor

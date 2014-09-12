@@ -43,12 +43,18 @@ public class QuartzServiceImpl implements QuartzService {
         try {
             List<String> triggers = getTriggerNames(triggerGroup);
             for (String trigger : triggers) {
-                TriggerKey triggerKey = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(trigger)).iterator().next();
-                boolean unscheduleJob = scheduler.unscheduleJob(triggerKey);
-                if (unscheduleJob) {
-                    log.debug("Trigger : [{}] deleted for group : [{}]", trigger, triggerGroup);
-                } else {
-                    log.error("Trigger : [{}] NOT deleted for group : [{}]", trigger, triggerGroup);
+                Iterable<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(trigger));
+                if (triggerKeys.iterator().hasNext()) {
+                    TriggerKey triggerKey = triggerKeys.iterator().next();
+                    boolean unscheduleJob = scheduler.unscheduleJob(triggerKey);
+                    if (unscheduleJob) {
+                        log.debug("Trigger : [{}] deleted for group : [{}]", trigger, triggerGroup);
+                    } else {
+                        log.error("Trigger : [{}] NOT deleted for group : [{}]", trigger, triggerGroup);
+                    }
+                }
+                else {
+                    log.debug("No triggerKeys found for trigger " + trigger + " and so no jobs were unscheduled.");
                 }
             }
         } catch (SchedulerException e) {

@@ -25,7 +25,7 @@ public class DateUtil {
         try {
             return new SimpleDateFormat("HH:mm", Locale.ENGLISH).parse(time);
         } catch (ParseException e) {
-            throw new InvalidDateException("The time " + time + " does not comply with the format dd/MM/yyy");
+            throw new InvalidDateException("The time " + time + " does not comply with the format HH:mm");
         }
 
     }

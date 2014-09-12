@@ -7,6 +7,7 @@ import org.celllife.appointmentreminders.domain.message.Message;
 import org.celllife.appointmentreminders.domain.message.MessageState;
 import org.celllife.appointmentreminders.framework.util.DateUtil;
 import org.celllife.appointmentreminders.integration.CommunicateService;
+import org.celllife.mobilisr.client.exception.RestCommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,16 +52,16 @@ public class BackgroundServiceImpl implements BackgroundService {
                 message.setCommunicateId(returnedId);
                 message.setMessageState(MessageState.SENT);
                 message.setMessageSent(new Date());
-            } catch (Exception e) {
+            } catch (RestCommandException e) {
                 message.setMessageState(MessageState.FAILED);
-                log.warn("Could not send message with id " + message.getId() + ". Reason: " + e.getLocalizedMessage());
+                log.warn("Could not send message with id " + message.getId() + ". Reason: " + e.getMessage(), e);
             }
             finally {
-                message.setRetryAttempts(message.getRetryAttempts() + 1);
+                message.increaseRetryCount();
                 try {
                     messageService.save(message);
                 } catch (RequiredFieldIsNullException e) {
-                    log.warn("Could save message with id " + message.getId() + ". Reason: " + e.getMessage());
+                    log.warn("Could save message with id " + message.getId() + ". Reason: " + e.getMessage(), e);
                 }
             }
 

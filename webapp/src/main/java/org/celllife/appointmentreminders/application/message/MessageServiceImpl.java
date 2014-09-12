@@ -2,10 +2,12 @@ package org.celllife.appointmentreminders.application.message;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.celllife.appointmentreminders.application.quartz.QuartzService;
+import org.celllife.appointmentreminders.domain.exception.AppointmentRemindersException;
 import org.celllife.appointmentreminders.domain.exception.RequiredFieldIsNullException;
 import org.celllife.appointmentreminders.domain.message.Message;
 import org.celllife.appointmentreminders.domain.message.MessageRepository;
 import org.celllife.appointmentreminders.domain.message.MessageState;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,8 +59,8 @@ public class MessageServiceImpl implements MessageService {
 
             try {
                 quartzService.scheduleOrUpdateMessageJob(message);
-            } catch (Exception e) {
-                log.error("Could not schedule message with id {0}. Reason: {1}", message.getId(), e.getMessage());
+            } catch (SchedulerException | AppointmentRemindersException e) {
+                log.error("Could not schedule message with id " + message.getId() + ". Reason: " + e.getMessage(), e);
             }
 
         }

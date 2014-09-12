@@ -3,6 +3,9 @@ package org.celllife.appointmentreminders.interfaces.service;
 import org.celllife.appointmentreminders.application.clinic.ClinicService;
 import org.celllife.appointmentreminders.domain.clinic.Clinic;
 import org.celllife.appointmentreminders.domain.clinic.ClinicDto;
+import org.celllife.appointmentreminders.domain.exception.ClinicCodeExistsException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -16,6 +19,8 @@ import java.util.List;
 @Controller
 public class ClinicController {
 
+    private Logger log = LoggerFactory.getLogger(this.getClass().getName().toString());
+
     @Autowired
     ClinicService clinicService;
 
@@ -24,11 +29,17 @@ public class ClinicController {
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.POST, value= "/service/clinic", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ClinicDto createClinic(@RequestBody ClinicDto clinicDto, HttpServletResponse response) throws Exception{
+    public ClinicDto createClinic(@RequestBody ClinicDto clinicDto, HttpServletResponse response) {
 
         //Create new clinic
         Clinic clinic = new Clinic(clinicDto.getName(), clinicDto.getCode(), clinicDto.getEncryptedPassword(), clinicDto.getSalt());
-        clinic = clinicService.save(clinic);
+        try {
+            clinic = clinicService.save(clinic);
+        } catch (ClinicCodeExistsException e) {
+            log.warn(e.getMessage());
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return null;
+        }
 
         //Create data transfer object and send it back to the client
         //response.setStatus(HttpServletResponse.SC_CREATED); //FIXME: the Mobilisr client (in iDart) throws an exception when it gets 201 Created
@@ -39,12 +50,14 @@ public class ClinicController {
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.PUT,value = "/service/clinic/{clinicId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ClinicDto updateClinic(@RequestBody ClinicDto clinicDto, @PathVariable Long clinicId) throws Exception {
+    public ClinicDto updateClinic(@RequestBody ClinicDto clinicDto, @PathVariable Long clinicId, HttpServletResponse response) {
 
         // Retrieve the clinic entity with id clinicId
         Clinic clinic = clinicService.get(clinicId);
         if (clinic == null) {
-            throw new Exception("A clinic with this identifier does not exist. Please check the url.");
+            log.warn("A clinic with this identifier does not exist. Please check the url.");
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return null;
         }
 
         // Update the clinic where necessary and save
@@ -57,7 +70,13 @@ public class ClinicController {
         if (clinicDto.getSalt() != null)
             clinic.setSalt(clinicDto.getSalt());
 
-        clinic = clinicService.save(clinic);
+        try {
+            clinic = clinicService.save(clinic);
+        } catch (ClinicCodeExistsException e) {
+            log.warn(e.getMessage());
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return null;
+        }
 
         return clinic.getClinicDto();
 
@@ -80,12 +99,14 @@ public class ClinicController {
 
     @ResponseBody
     @RequestMapping(value = "/service/clinic/{clinicId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ClinicDto getClinic(@PathVariable Long clinicId) throws Exception {
+    public ClinicDto getClinic(@PathVariable Long clinicId, HttpServletResponse response) {
 
         Clinic clinic = clinicService.get(clinicId);
 
         if (clinic == null) {
-            throw new Exception("A clinic with this identifier does not exist. Please check the url.");
+            log.warn("Could not find clinic with id " + clinicId);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return null;
         }
 
         return clinic.getClinicDto();
