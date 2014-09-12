@@ -1,6 +1,13 @@
 package org.celllife.appointmentreminders.domain.patient;
 
-public class PatientDto {
+import java.io.Serializable;
+
+/**
+ * Data Transfer Object (DTO) for the Patient entity. Used by the REST interface.
+ */
+public class PatientDto implements Serializable {
+
+    private static final long serialVersionUID = 2239616278983798243L;
 
     private Long id;
 
@@ -50,5 +57,11 @@ public class PatientDto {
 
     public void setSubscribed(Boolean subscribed) {
         this.subscribed = subscribed;
+    }
+
+    @Override
+    public String toString() {
+        return "PatientDto [id=" + id + ", patientCode=" + patientCode + ", clinicId=" + clinicId + ", msisdn="
+                + msisdn + ", subscribed=" + subscribed + "]";
     }
 }

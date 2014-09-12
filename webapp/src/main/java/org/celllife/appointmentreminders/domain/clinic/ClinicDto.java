@@ -2,7 +2,12 @@ package org.celllife.appointmentreminders.domain.clinic;
 
 import java.io.Serializable;
 
+/**
+ * Data Transfer Object for the Clinic entity. Used by the REST interface.
+ */
 public class ClinicDto implements Serializable {
+
+    private static final long serialVersionUID = -3466580491561864280L;
 
     private Long id;
 
@@ -52,5 +57,11 @@ public class ClinicDto implements Serializable {
 
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    @Override
+    public String toString() {
+        return "ClinicDto [id=" + id + ", name=" + name + ", code=" + code + ", encryptedPassword=" + encryptedPassword
+                + ", salt=" + salt + "]";
     }
 }
