@@ -2,6 +2,7 @@ package org.celllife.appointmentreminders.application.patient;
 
 import org.celllife.appointmentreminders.domain.exception.ClinicCodeNonexistentException;
 import org.celllife.appointmentreminders.domain.exception.PatientCodeExistsException;
+import org.celllife.appointmentreminders.domain.exception.PatientCodeNonexistentException;
 import org.celllife.appointmentreminders.domain.exception.RequiredFieldIsNullException;
 import org.celllife.appointmentreminders.domain.patient.Patient;
 
@@ -39,7 +40,9 @@ public interface PatientService {
      * @param clinicCode
      * @return
      * @throws ClinicCodeNonexistentException
+     * @throws PatientCodeNonexistentException
      */
-    Patient findByPatientCodeAndClinicCode(String patientCode, String clinicCode) throws ClinicCodeNonexistentException;
+    Patient findByPatientCodeAndClinicCode(String patientCode, String clinicCode)
+            throws ClinicCodeNonexistentException, PatientCodeNonexistentException;
 
 }
