@@ -1,15 +1,21 @@
 package org.celllife.appointmentreminders.domain.clinic;
 
-import javax.persistence.*;
-
 import java.io.Serializable;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.TableGenerator;
+
+import org.celllife.security.domain.SecurityUser;
 
 /**
  * Defines the Clinic domain entity. A Clinic is a medical facility with Patients who have Appointments. The Clinic entity is
  * used to provide authentication credentials for the facility using the service to send Appointment related messages.   
  */
 @Entity
-public class Clinic implements Serializable {
+public class Clinic implements Serializable, SecurityUser {
 
     private static final long serialVersionUID = 3718726486523331541L;
 
@@ -73,8 +79,6 @@ public class Clinic implements Serializable {
         clinicDto.setId(this.getId());
         clinicDto.setName(this.getName());
         clinicDto.setCode(this.getCode());
-        clinicDto.setEncryptedPassword(this.getEncryptedPassword());
-        clinicDto.setSalt(this.getSalt());
         return clinicDto;
     }
     
@@ -125,6 +129,11 @@ public class Clinic implements Serializable {
      */
     public void setCode(String code) {
         this.code = code;
+    }
+
+    @Override
+    public String getLogin() {
+        return this.code;
     }
 
     /**

@@ -14,5 +14,9 @@
             <column name="salt" type="VARCHAR(64)" />
         </createTable>
     </changeSet>
+    
+    <changeSet author="dagmar@cell-life.org" id="clinic-2">
+        <modifyDataType tableName="clinic" columnName="encrypted_password" newDataType="VARCHAR(64)" />
+    </changeSet>
 
 </databaseChangeLog>

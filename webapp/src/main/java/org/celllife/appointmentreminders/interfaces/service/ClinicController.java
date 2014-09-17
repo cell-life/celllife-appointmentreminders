@@ -1,20 +1,26 @@
 package org.celllife.appointmentreminders.interfaces.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.celllife.appointmentreminders.application.clinic.ClinicService;
 import org.celllife.appointmentreminders.domain.clinic.Clinic;
 import org.celllife.appointmentreminders.domain.clinic.ClinicDto;
 import org.celllife.appointmentreminders.domain.exception.ClinicCodeExistsException;
+import org.celllife.security.utils.SecurityServiceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class ClinicController {
@@ -31,8 +37,9 @@ public class ClinicController {
     @RequestMapping(method = RequestMethod.POST, value= "/service/clinic", produces = MediaType.APPLICATION_JSON_VALUE)
     public ClinicDto createClinic(@RequestBody ClinicDto clinicDto, HttpServletResponse response) {
 
-        //Create new clinic
-        Clinic clinic = new Clinic(clinicDto.getName(), clinicDto.getCode(), clinicDto.getEncryptedPassword(), clinicDto.getSalt());
+        //Create new clinic and encrypt the password
+        Clinic clinic = new Clinic(clinicDto.getName(), clinicDto.getCode());
+        SecurityServiceUtils.setPasswordAndSalt(clinic, clinicDto.getPassword());
         try {
             clinic = clinicService.save(clinic);
         } catch (ClinicCodeExistsException e) {
@@ -65,10 +72,6 @@ public class ClinicController {
             clinic.setName(clinicDto.getName());
         if (clinicDto.getCode() != null)
             clinic.setCode(clinicDto.getCode());
-        if (clinicDto.getEncryptedPassword() != null)
-            clinic.setEncryptedPassword(clinicDto.getEncryptedPassword());
-        if (clinicDto.getSalt() != null)
-            clinic.setSalt(clinicDto.getSalt());
 
         try {
             clinic = clinicService.save(clinic);
