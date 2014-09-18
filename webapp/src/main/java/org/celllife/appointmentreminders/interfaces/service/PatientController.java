@@ -1,9 +1,15 @@
 package org.celllife.appointmentreminders.interfaces.service;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.celllife.appointmentreminders.application.clinic.ClinicService;
 import org.celllife.appointmentreminders.application.patient.PatientService;
 import org.celllife.appointmentreminders.domain.clinic.Clinic;
-import org.celllife.appointmentreminders.domain.exception.*;
+import org.celllife.appointmentreminders.domain.exception.ClinicCodeNonexistentException;
+import org.celllife.appointmentreminders.domain.exception.InvalidMsisdnException;
+import org.celllife.appointmentreminders.domain.exception.PatientCodeExistsException;
+import org.celllife.appointmentreminders.domain.exception.PatientCodeNonexistentException;
+import org.celllife.appointmentreminders.domain.exception.RequiredFieldIsNullException;
 import org.celllife.appointmentreminders.domain.patient.Patient;
 import org.celllife.appointmentreminders.domain.patient.PatientDto;
 import org.slf4j.Logger;
@@ -12,9 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class PatientController {
@@ -36,8 +44,10 @@ public class PatientController {
     @RequestMapping(method = RequestMethod.POST, value= "/service/patient", produces = MediaType.APPLICATION_JSON_VALUE)
     public PatientDto createPatient(@RequestBody PatientDto patientDto, @RequestParam(required = true) String clinicCode, HttpServletResponse response) {
 
-        Clinic clinic = clinicService.findClinicByCode(clinicCode);
-        if (clinic == null) {
+        Clinic clinic = null;
+        try {
+            clinic = clinicService.findClinicByCode(clinicCode);
+        } catch (ClinicCodeNonexistentException e) {
             log.warn("Sorry, no clinic with code " + clinicCode + " exists.");
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return null;
@@ -80,7 +90,14 @@ public class PatientController {
         } catch (ClinicCodeNonexistentException | PatientCodeNonexistentException e) { // If the patient does not exist, create a new one.
 
             log.info("A patient with clinic code " + clinicCode + " and patient code " + patientDto.getPatientCode() + " does not exist. System will create a new one.");
-            Clinic clinic = clinicService.findClinicByCode(clinicCode);
+            Clinic clinic = null;
+            try {
+                clinic = clinicService.findClinicByCode(clinicCode);
+            } catch (ClinicCodeNonexistentException ex) {
+                log.warn("Sorry, no clinic with code " + clinicCode + " exists.");
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return null;
+            }
             try {
                 patient =  new Patient(clinic.getId(), patientDto.getPatientCode(), patientDto.getMsisdn(), patientDto.getSubscribed());
             } catch (InvalidMsisdnException e1) {

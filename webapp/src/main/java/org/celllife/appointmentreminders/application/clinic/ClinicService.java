@@ -1,9 +1,10 @@
 package org.celllife.appointmentreminders.application.clinic;
 
+import java.util.List;
+
 import org.celllife.appointmentreminders.domain.clinic.Clinic;
 import org.celllife.appointmentreminders.domain.exception.ClinicCodeExistsException;
-
-import java.util.List;
+import org.celllife.appointmentreminders.domain.exception.ClinicCodeNonexistentException;
 
 public interface ClinicService {
 
@@ -32,7 +33,8 @@ public interface ClinicService {
      * Finds a clinic by code.
      * @param code
      * @return
+     * @throws ClinicCodeNonexistentException if there is no clinic with the specified code 
      */
-    Clinic findClinicByCode(String code);
+    Clinic findClinicByCode(String code) throws ClinicCodeNonexistentException;
 
 }
