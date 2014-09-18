@@ -10,6 +10,7 @@ public interface AppointmentService {
 
     /**
      * Saves an appointment. Will throw an exception if the patient id, appointment date or appointment time is null.
+     * If an appointment already exists, will not create a new appointment for the Patient.
      * @param appointment
      * @return The new or updated appointment.
      * @throws RequiredFieldIsNullException
@@ -22,6 +23,13 @@ public interface AppointmentService {
      * @return
      */
     Appointment get(Long appointmentId);
+
+    /**
+     * Deletes the specified appointment (and all its messages)
+     * @param appointmentId Long appointment identifier
+     * @return Appointment
+     */
+    Appointment delete(Long appointmentId);
 
     /**
      * Returns true if an appointment of this date and time already exists for the patient.

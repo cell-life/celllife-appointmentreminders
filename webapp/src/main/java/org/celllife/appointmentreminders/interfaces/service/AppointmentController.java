@@ -1,5 +1,10 @@
 package org.celllife.appointmentreminders.interfaces.service;
 
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.celllife.appointmentreminders.application.appointment.AppointmentService;
 import org.celllife.appointmentreminders.application.message.MessageService;
 import org.celllife.appointmentreminders.application.patient.PatientService;
@@ -20,9 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class AppointmentController {
@@ -49,7 +57,7 @@ public class AppointmentController {
 
         Patient patient;
         try {
-            patient = patientService.findByPatientCodeAndClinicCode(clinicCode,patientCode);
+            patient = patientService.findByPatientCodeAndClinicCode(patientCode, clinicCode);
         } catch (ClinicCodeNonexistentException | PatientCodeNonexistentException e) {
             log.warn(e.getLocalizedMessage());
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -169,6 +177,59 @@ public class AppointmentController {
 
         return appointment.getAppointmentDto();
 
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = "/service/appointment/{appointmentId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public AppointmentDto deleteAppointmentWithId(@PathVariable Long appointmentId, HttpServletResponse response) {
+
+       Appointment appointment = appointmentService.delete(appointmentId);
+       log.info("Deleted appointment "+appointment);
+
+        if (appointment == null) {
+            log.warn("Could not find appointment with id " + appointmentId);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return null;
+        }
+
+        return appointment.getAppointmentDto();
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = "/service/appointment", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public AppointmentDto deleteAppointment(@RequestBody AppointmentDto appointmentDto, @RequestParam(required = true) String clinicCode, @RequestParam(required = true) String patientCode, HttpServletResponse response) {
+        
+        Patient patient = null;
+        try {
+            patient = patientService.findByPatientCodeAndClinicCode(patientCode,clinicCode);
+        } catch (ClinicCodeNonexistentException | PatientCodeNonexistentException e) {
+            log.warn(e.getLocalizedMessage());
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return null;
+        }
+        
+        try {
+            Date appointmentDate = DateUtil.getDateFromString(appointmentDto.getAppointmentDate());
+            Date appointmentTime = DateUtil.getTimeFromString(appointmentDto.getAppointmentTime());
+    
+            Appointment appointment = null;
+            List<Appointment> appointments = appointmentService.findByPatientIdAndDateTimeStamp(patient.getId(), appointmentDate, appointmentTime);
+            if (appointments == null || appointments.isEmpty()) {
+                log.warn("Could not find appointment for patient " + patientCode + " at clinic " + clinicCode + " on " + appointmentDto.getAppointmentDate());
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return null;
+            }
+            appointment = appointments.get(0);
+            log.info("Deleting appointment "+appointment);
+            appointmentService.delete(appointment.getId());
+
+            return appointment.getAppointmentDto();
+
+        } catch (InvalidDateException e) {
+            log.warn(e.getLocalizedMessage());
+            response.setStatus(SC_UNPROCESSABLE_ENTITY);
+            return null;
+        }
     }
 
 }
