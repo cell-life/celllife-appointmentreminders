@@ -25,7 +25,7 @@ public class Clinic implements Serializable, SecurityUser {
             table="hibernate_sequences",
             pkColumnName="sequence_name",
             valueColumnName="sequence_next_hi_value",
-            pkColumnValue="alert",
+            pkColumnValue="clinic",
             initialValue=1,
             allocationSize=1)
     @GeneratedValue(strategy= GenerationType.TABLE, generator="ClinicIdGen")

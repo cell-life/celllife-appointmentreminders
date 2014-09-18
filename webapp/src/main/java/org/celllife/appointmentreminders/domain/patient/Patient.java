@@ -21,7 +21,7 @@ public class Patient implements Serializable {
             table="hibernate_sequences",
             pkColumnName="sequence_name",
             valueColumnName="sequence_next_hi_value",
-            pkColumnValue="alert",
+            pkColumnValue="patient",
             initialValue=1,
             allocationSize=1)
     @GeneratedValue(strategy= GenerationType.TABLE, generator="PatientIdGen")
