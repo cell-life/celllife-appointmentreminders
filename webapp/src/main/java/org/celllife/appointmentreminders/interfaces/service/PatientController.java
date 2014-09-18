@@ -66,7 +66,7 @@ public class PatientController {
             patient = patientService.save(patient);
         } catch (PatientCodeExistsException e) {
             log.warn(e.getMessage());
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
         } catch (RequiredFieldIsNullException e) {
             log.warn(e.getMessage());
             response.setStatus(SC_UNPROCESSABLE_ENTITY);
@@ -118,7 +118,7 @@ public class PatientController {
             return null;
         } catch (PatientCodeExistsException e) {
             log.warn(e.getMessage());
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
             return null;
         }
 

@@ -44,7 +44,7 @@ public class ClinicController {
             clinic = clinicService.save(clinic);
         } catch (ClinicCodeExistsException e) {
             log.warn(e.getMessage());
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
             return null;
         }
 
@@ -76,8 +76,10 @@ public class ClinicController {
         try {
             clinic = clinicService.save(clinic);
         } catch (ClinicCodeExistsException e) {
+            // this exception should never occur since the check here is if the id is null and there is already a clinic
+            // with the specified code. since we retrieve the clinic a couple lines above, the id should never be null.
             log.warn(e.getMessage());
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
             return null;
         }
 
