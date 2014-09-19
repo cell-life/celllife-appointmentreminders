@@ -38,6 +38,8 @@ public class Appointment implements Serializable {
     @Basic(optional=false)
     private Date appointmentTime;
 
+    @Basic
+    @Column(name = "attended", columnDefinition = "BIT", length = 1)
     private Boolean attended = Boolean.FALSE;
 
     /**
