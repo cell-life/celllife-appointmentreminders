@@ -1,6 +1,8 @@
 package org.celllife.appointmentreminders.application.message;
 
-import org.apache.commons.collections.IteratorUtils;
+import java.util.Date;
+import java.util.List;
+
 import org.celllife.appointmentreminders.application.quartz.QuartzService;
 import org.celllife.appointmentreminders.domain.exception.AppointmentRemindersException;
 import org.celllife.appointmentreminders.domain.exception.RequiredFieldIsNullException;
@@ -12,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
-import java.util.List;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -37,15 +36,10 @@ public class MessageServiceImpl implements MessageService {
 
         // if a message with this date and time exists for this appointment, simply update it
         if ((message.getId() == null) && messageExists(message.getAppointmentId(), message.getMessageDate(), message.getMessageTime())) {
-
             Message oldMessage = findByAppointmentIdAndDateTimeStamp(message.getAppointmentId(), message.getMessageDate(), message.getMessageTime()).get(0);
             oldMessage.setMessageText(message.getMessageText());
             oldMessage.setMessageType(message.getMessageType());
-            message = messageRepository.save(oldMessage);
-
-        } else { // otherwise save the new message
-            message = messageRepository.save(message);
-        }
+        } 
 
         if (message.getMessageState() == null) {
             message.setMessageState(MessageState.SCHEDULED);
@@ -53,6 +47,7 @@ public class MessageServiceImpl implements MessageService {
         if (message.getMessageText() == null) {
             message.setMessageText("Empty Message");
         }
+
         message = messageRepository.save(message);
 
         if (message.getMessageDateTime().after(new Date())) {
@@ -76,17 +71,17 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public boolean messageExists(Long appointmentId, Date messageDate, Date messageTime) {
-        return (findByAppointmentIdAndDateTimeStamp(appointmentId, messageDate, messageTime).size() > 0);
+        return messageRepository.exists(appointmentId, messageDate, messageTime);
     }
 
     @Override
     public List<Message> findByAppointmentIdAndDateTimeStamp(Long appointmentId, Date messageDate, Date messageTime) {
-        return IteratorUtils.toList(messageRepository.findByAppointmentIdAndMessageDateAndMessageTime(appointmentId, messageDate, messageTime).iterator());
+        return messageRepository.findByAppointmentIdAndMessageDateAndMessageTime(appointmentId, messageDate, messageTime);
     }
 
     @Override
     public List<Message> findByMessageStateAndMessageDate(MessageState messageState, Date messageDate) {
-        return IteratorUtils.toList(messageRepository.findByMessageStateAndMessageDate(messageState, messageDate).iterator());
+        return messageRepository.findByMessageStateAndMessageDate(messageState, messageDate);
     }
 
 }

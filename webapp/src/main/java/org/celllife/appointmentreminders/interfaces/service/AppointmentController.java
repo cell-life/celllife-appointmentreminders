@@ -91,29 +91,31 @@ public class AppointmentController {
 
         log.debug("Saving appointment with id " + appointment.getId() + ", date " + appointmentDto.getAppointmentDate() + ", time " + appointmentDto.getAppointmentTime());
 
-        for (MessageDto messageDto : appointmentDto.getMessages()) {
-            Message message = null;
-            try {
-                message = new Message(appointment.getId(),
-                        DateUtil.getDateFromString(messageDto.getMessageDate()),
-                        DateUtil.getTimeFromString(messageDto.getMessageTime()),
-                        messageDto.getMessageText(),
-                        messageDto.getMessageType());
-            } catch (InvalidDateException e) {
-                log.warn(e.getLocalizedMessage());
-                response.setStatus(SC_UNPROCESSABLE_ENTITY);
-                return null;
+        if (appointmentDto.getMessages() != null) {
+            for (MessageDto messageDto : appointmentDto.getMessages()) {
+                Message message = null;
+                try {
+                    message = new Message(appointment.getId(),
+                            DateUtil.getDateFromString(messageDto.getMessageDate()),
+                            DateUtil.getTimeFromString(messageDto.getMessageTime()),
+                            messageDto.getMessageText(),
+                            messageDto.getMessageType(),
+                            messageDto.getMessageSlot());
+                } catch (InvalidDateException e) {
+                    log.warn(e.getLocalizedMessage());
+                    response.setStatus(SC_UNPROCESSABLE_ENTITY);
+                    return null;
+                }
+                try {
+                    messageService.save(message);
+                } catch (RequiredFieldIsNullException e) {
+                    log.warn(e.getLocalizedMessage());
+                    response.setStatus(SC_UNPROCESSABLE_ENTITY);
+                    return null;
+                }
+    
+                log.debug("Saving message with id " + message.getId() + ", date " + appointmentDto.getAppointmentDate() + ", time " + appointmentDto.getAppointmentTime());
             }
-            try {
-                messageService.save(message);
-            } catch (RequiredFieldIsNullException e) {
-                log.warn(e.getLocalizedMessage());
-                response.setStatus(SC_UNPROCESSABLE_ENTITY);
-                return null;
-            }
-
-            log.debug("Saving message with id " + message.getId() + ", date " + appointmentDto.getAppointmentDate() + ", time " + appointmentDto.getAppointmentTime());
-
         }
 
         //response.setStatus(HttpServletResponse.SC_CREATED); //FIXME: the Mobilisr client (in iDart) throws an exception when it gets 201 Created
@@ -158,23 +160,26 @@ public class AppointmentController {
         log.debug("Saved appointment with id " + appointment.getId() + ", date " + appointmentDto.getAppointmentDate() + ", time " + appointmentDto.getAppointmentTime());
 
         // append the specified messages
-        for (MessageDto messageDto : appointmentDto.getMessages()) {
-            Message message;
-            try {
-                message = new Message(appointment.getId(),
-                        DateUtil.getDateFromString(messageDto.getMessageDate()),
-                        DateUtil.getTimeFromString(messageDto.getMessageTime()),
-                        messageDto.getMessageText(),
-                        messageDto.getMessageType());
-                message = messageService.save(message);
-            } catch (InvalidDateException | RequiredFieldIsNullException e) {
-                log.warn(e.getLocalizedMessage());
-                response.setStatus(SC_UNPROCESSABLE_ENTITY);
-                return null;
+        if (appointmentDto.getMessages() != null) {
+            for (MessageDto messageDto : appointmentDto.getMessages()) {
+                Message message;
+                try {
+                    message = new Message(appointment.getId(),
+                            DateUtil.getDateFromString(messageDto.getMessageDate()),
+                            DateUtil.getTimeFromString(messageDto.getMessageTime()),
+                            messageDto.getMessageText(),
+                            messageDto.getMessageType(),
+                            messageDto.getMessageSlot());
+                    message = messageService.save(message);
+                } catch (InvalidDateException | RequiredFieldIsNullException e) {
+                    log.warn(e.getLocalizedMessage());
+                    response.setStatus(SC_UNPROCESSABLE_ENTITY);
+                    return null;
+                }
+    
+                log.debug("Saved message with id " + message.getId() + ", date " + messageDto.getMessageDate() + ", time " + messageDto.getMessageTime());
+    
             }
-
-            log.debug("Saved message with id " + message.getId() + ", date " + messageDto.getMessageDate() + ", time " + messageDto.getMessageTime());
-
         }
 
         //response.setStatus(HttpServletResponse.SC_CREATED); //FIXME: the Mobilisr client (in iDart) throws an exception when it gets 201 Created

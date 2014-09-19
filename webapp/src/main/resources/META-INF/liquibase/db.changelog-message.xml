@@ -45,4 +45,10 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="message-7" author="dagmar@cell-life.org">
+        <addColumn tableName="message">
+            <column name="message_slot" type="INT" value="0"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

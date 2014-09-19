@@ -44,6 +44,8 @@ public class Message implements Serializable {
 
     @Enumerated(EnumType.STRING)
     private MessageType messageType;
+    
+    private Integer messageSlot;
 
     @Enumerated(EnumType.STRING)
     private MessageState messageState = MessageState.NEW;
@@ -69,13 +71,15 @@ public class Message implements Serializable {
      * @param messageTime Date the time the message should be sent
      * @param messageText String the message contents. Note: An SMS is 160 characters
      * @param messageType MessageType the type of the message (reminder or missed)
+     * @param messageSlot Integer the sequential number of the message (i.e. 1st missed appointment message)
      */
-    public Message(Long appointmentId, Date messageDate, Date messageTime, String messageText, MessageType messageType) {
+    public Message(Long appointmentId, Date messageDate, Date messageTime, String messageText, MessageType messageType, Integer messageSlot) {
         this.appointmentId = appointmentId;
         this.messageDate = messageDate;
         this.messageTime = messageTime;
         this.messageText = messageText;
         this.messageType = messageType;
+        this.messageSlot = messageSlot;
     }
 
     /**
@@ -90,6 +94,7 @@ public class Message implements Serializable {
         messageDto.setMessageTime(DateUtil.TimeToString(this.getMessageTime()));
         messageDto.setMessageType(this.getMessageType());
         messageDto.setMessageState(this.messageState);
+        messageDto.setMessageSlot(this.messageSlot);
         return messageDto;
     }
 
@@ -254,6 +259,28 @@ public class Message implements Serializable {
         this.messageSent = messageSent;
     }
 
+    /**
+     * Retrieve the number indicating the sequence number of the message. In other words, if this was the 1st missed appointment
+     * message then the messageSlot would be 1.
+     *
+     * @return Integer message slot
+     */
+    public Integer getMessageSlot() {
+        return messageSlot;
+    }
+
+    /**
+     * Set the message sequence number.
+     *
+     * @param messageSlot Integer message lot
+     */
+    public void setMessageSlot(Integer messageSlot) {
+        this.messageSlot = messageSlot;
+    }
+
+    /**
+     * Increment the retry count by 1 (in the case of a failed retry event)
+     */
     public void increaseRetryCount() {
         if (this.getRetryAttempts() == null) {
             this.setRetryAttempts(1);
@@ -320,7 +347,7 @@ public class Message implements Serializable {
     public String toString() {
         return "Message [id=" + id + ", appointmentId=" + appointmentId + ", messageDate=" + messageDate
                 + ", messageTime=" + messageTime + ", messageText=" + messageText + ", messageType=" + messageType
-                + ", messageState=" + messageState + ", retryAttempts=" + retryAttempts + ", communicateId="
-                + communicateId + ", messageSent=" + messageSent + "]";
+                + ", messageSlot=" + messageSlot + ", messageState=" + messageState + ", retryAttempts="
+                + retryAttempts + ", communicateId=" + communicateId + ", messageSent=" + messageSent + "]";
     }
 }
