@@ -64,9 +64,18 @@ public class AppointmentController {
             return null;
         }
 
-        Appointment appointment;
+        Appointment appointment = null;
         try {
-            appointment = new Appointment(patient.getId(), DateUtil.getDateFromString(appointmentDto.getAppointmentDate()), DateUtil.getTimeFromString(appointmentDto.getAppointmentTime()));
+            Date appointmentDate = DateUtil.getDateFromString(appointmentDto.getAppointmentDate());
+            Date appointmentTime = DateUtil.getTimeFromString(appointmentDto.getAppointmentTime());
+            
+            if (appointmentService.appointmentExists(patient.getId(), appointmentDate, appointmentTime)) {
+                log.warn("The appointment already exists, so cannot create a new appointment." + appointment);
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                return null;
+            }
+            appointment = new Appointment(patient.getId(), appointmentDate, appointmentTime);
+            appointment.setAttended(appointmentDto.getAttended());
         } catch (InvalidDateException e) {
             log.warn(e.getLocalizedMessage());
             response.setStatus(SC_UNPROCESSABLE_ENTITY);
@@ -126,9 +135,19 @@ public class AppointmentController {
             return null;
         }
 
-        Appointment appointment;
+        Appointment appointment = null;
         try {
-            appointment = new Appointment(patient.getId(), DateUtil.getDateFromString(appointmentDto.getAppointmentDate()), DateUtil.getTimeFromString(appointmentDto.getAppointmentTime()));
+            Date appointmentDate = DateUtil.getDateFromString(appointmentDto.getAppointmentDate());
+            Date appointmentTime = DateUtil.getTimeFromString(appointmentDto.getAppointmentTime());
+            
+            if (appointmentService.appointmentExists(patient.getId(), appointmentDate, appointmentTime)) {
+                List<Appointment> appointments = appointmentService.findByPatientIdAndDateTimeStamp(patient.getId(), appointmentDate, appointmentTime);
+                appointment = appointments.get(0);
+            } else {
+                // create a new appointment if one doesn't exist
+                appointment = new Appointment(patient.getId(), DateUtil.getDateFromString(appointmentDto.getAppointmentDate()), DateUtil.getTimeFromString(appointmentDto.getAppointmentTime()));
+            }
+            appointment.setAttended(appointmentDto.getAttended());
             appointment = appointmentService.save(appointment);
         } catch (InvalidDateException | RequiredFieldIsNullException e) {
             log.warn(e.getLocalizedMessage());
@@ -138,6 +157,7 @@ public class AppointmentController {
 
         log.debug("Saved appointment with id " + appointment.getId() + ", date " + appointmentDto.getAppointmentDate() + ", time " + appointmentDto.getAppointmentTime());
 
+        // append the specified messages
         for (MessageDto messageDto : appointmentDto.getMessages()) {
             Message message;
             try {
@@ -231,5 +251,4 @@ public class AppointmentController {
             return null;
         }
     }
-
 }

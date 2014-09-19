@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
     
+    @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(AppointmentServiceImpl.class);
 
     @Autowired
@@ -24,11 +25,6 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         if ((appointment.getPatientId() == null) || (appointment.getAppointmentDate() == null) || (appointment.getAppointmentTime() == null)) {
             throw new RequiredFieldIsNullException("PatientId, AppointmentDate and AppointmentTime must all be not null");
-        } else if (appointment.getId() == null && appointmentExists(appointment.getPatientId(), appointment.getAppointmentDate(), appointment.getAppointmentTime())) {
-            log.debug("The appointment already exists, so not creating a new appointment." + appointment);
-            List<Appointment> appointments = findByPatientIdAndDateTimeStamp(appointment.getPatientId(),
-                    appointment.getAppointmentDate(), appointment.getAppointmentTime());
-            return appointments.get(0);
         } else {
             return appointmentRepository.save(appointment);
         }

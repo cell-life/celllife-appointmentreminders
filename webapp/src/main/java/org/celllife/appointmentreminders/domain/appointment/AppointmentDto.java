@@ -16,6 +16,8 @@ public class AppointmentDto implements Serializable {
     private String appointmentDate;
 
     private String appointmentTime;
+    
+    private Boolean attended = Boolean.FALSE;
 
     public Long getId() {
         return id;
@@ -65,9 +67,25 @@ public class AppointmentDto implements Serializable {
         this.appointmentTime = appointmentTime;
     }
 
+    /**
+     * Determine if the patient attended the appointment or not
+     * @return True if the patient attended their appointment
+     */
+    public Boolean getAttended() {
+        return attended;
+    }
+
+    /**
+     * Indicate if the patient attended their appointment
+     * @param attended True if the appointment was attended
+     */
+    public void setAttended(Boolean attended) {
+        this.attended = attended;
+    }
+
     @Override
     public String toString() {
         return "AppointmentDto [id=" + id + ", patientId=" + patientId + ", appointmentDate=" + appointmentDate
-                + ", appointmentTime=" + appointmentTime + "]";
+                + ", appointmentTime=" + appointmentTime + ", attended=" + attended + "]";
     }
 }

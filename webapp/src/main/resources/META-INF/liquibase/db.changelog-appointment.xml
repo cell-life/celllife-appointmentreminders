@@ -14,4 +14,15 @@
         </createTable>
     </changeSet>
 
+    <changeSet author="dagmar@cell-life.org" id="appointment-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="appointment" columnName="attended" />
+            </not>
+        </preConditions>
+        <addColumn tableName="appointment">
+            <column name="attended" type="BOOLEAN" defaultValueBoolean="false" />
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
