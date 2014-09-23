@@ -222,7 +222,8 @@ public class AppointmentController {
     
     @ResponseBody
     @RequestMapping(value = "/service/appointment", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public AppointmentDto deleteAppointment(@RequestBody AppointmentDto appointmentDto, @RequestParam(required = true) String clinicCode, @RequestParam(required = true) String patientCode, HttpServletResponse response) {
+    public AppointmentDto deleteAppointment(@RequestParam(required = true) String clinicCode, @RequestParam(required = true) String patientCode, 
+            @RequestParam(required = true) String appointmentDate, @RequestParam(required = true) String appointmentTime, HttpServletResponse response) {
         
         Patient patient = null;
         try {
@@ -234,13 +235,13 @@ public class AppointmentController {
         }
         
         try {
-            Date appointmentDate = DateUtil.getDateFromString(appointmentDto.getAppointmentDate());
-            Date appointmentTime = DateUtil.getTimeFromString(appointmentDto.getAppointmentTime());
+            Date parsedAppointmentDate = DateUtil.getDateFromString(appointmentDate);
+            Date parsedAppointmentTime = DateUtil.getTimeFromString(appointmentTime);
     
             Appointment appointment = null;
-            List<Appointment> appointments = appointmentService.findByPatientIdAndDateTimeStamp(patient.getId(), appointmentDate, appointmentTime);
+            List<Appointment> appointments = appointmentService.findByPatientIdAndDateTimeStamp(patient.getId(), parsedAppointmentDate, parsedAppointmentTime);
             if (appointments == null || appointments.isEmpty()) {
-                log.warn("Could not find appointment for patient " + patientCode + " at clinic " + clinicCode + " on " + appointmentDto.getAppointmentDate());
+                log.warn("Could not find appointment for patient " + patientCode + " at clinic " + clinicCode + " on " + appointmentDate);
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return null;
             }
