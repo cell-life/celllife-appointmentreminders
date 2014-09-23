@@ -21,7 +21,7 @@ public class Appointment implements Serializable {
             table="hibernate_sequences",
             pkColumnName="sequence_name",
             valueColumnName="sequence_next_hi_value",
-            pkColumnValue="alert",
+            pkColumnValue="appointment",
             initialValue=1,
             allocationSize=1)
     @GeneratedValue(strategy= GenerationType.TABLE, generator="applicationIdGen")
@@ -37,6 +37,10 @@ public class Appointment implements Serializable {
     @Temporal(TemporalType.TIME)
     @Basic(optional=false)
     private Date appointmentTime;
+
+    @Basic
+    @Column(name = "attended", columnDefinition = "BIT", length = 1)
+    private Boolean attended = Boolean.FALSE;
 
     /**
      * Default constructor
@@ -66,6 +70,7 @@ public class Appointment implements Serializable {
         appointmentDto.setPatientId(this.getPatientId());
         appointmentDto.setAppointmentDate(DateUtil.DateToString(this.getAppointmentDate()));
         appointmentDto.setAppointmentTime(DateUtil.TimeToString(this.getAppointmentTime()));
+        appointmentDto.setAttended(this.getAttended());
         return appointmentDto;
     }
 
@@ -134,6 +139,22 @@ public class Appointment implements Serializable {
         this.appointmentTime = appointmentTime;
     }
 
+    /**
+     * Determine if the patient attended the appointment or not
+     * @return True if the patient attended their appointment
+     */
+    public Boolean getAttended() {
+        return attended;
+    }
+
+    /**
+     * Indicate if the patient attended their appointment
+     * @param attended True if the appointment was attended
+     */
+    public void setAttended(Boolean attended) {
+        this.attended = attended;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -162,6 +183,7 @@ public class Appointment implements Serializable {
     @Override
     public String toString() {
         return "Appointment [id=" + id + ", patientId=" + patientId + ", appointmentDate=" + appointmentDate
-                + ", appointmentTime=" + appointmentTime + "]";
+                + ", appointmentTime=" + appointmentTime + ", attended=" + attended + "]";
     }
+
 }

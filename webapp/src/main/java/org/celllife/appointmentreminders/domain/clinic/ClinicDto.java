@@ -15,9 +15,7 @@ public class ClinicDto implements Serializable {
 
     private String code;
 
-    private String encryptedPassword;
-
-    private String salt;
+    private String password;
 
     public Long getId() {
         return id;
@@ -43,25 +41,16 @@ public class ClinicDto implements Serializable {
         this.code = code;
     }
 
-    public String getEncryptedPassword() {
-        return encryptedPassword;
+    public String getPassword() {
+        return password;
     }
 
-    public void setEncryptedPassword(String encryptedPassword) {
-        this.encryptedPassword = encryptedPassword;
-    }
-
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
     public String toString() {
-        return "ClinicDto [id=" + id + ", name=" + name + ", code=" + code + ", encryptedPassword=" + encryptedPassword
-                + ", salt=" + salt + "]";
+        return "ClinicDto [id=" + id + ", name=" + name + ", code=" + code + ", password=" + password + "]";
     }
 }

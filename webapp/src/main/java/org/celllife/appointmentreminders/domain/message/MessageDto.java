@@ -22,6 +22,8 @@ public class MessageDto implements Serializable {
     private MessageType messageType;
 
     private MessageState messageState;
+    
+    private Integer messageSlot;
 
     public Long getId() {
         return id;
@@ -95,10 +97,18 @@ public class MessageDto implements Serializable {
         this.messageState = messageState;
     }
 
+    public Integer getMessageSlot() {
+        return messageSlot;
+    }
+
+    public void setMessageSlot(Integer messageSlot) {
+        this.messageSlot = messageSlot;
+    }
+
     @Override
     public String toString() {
         return "MessageDto [id=" + id + ", appointmentId=" + appointmentId + ", messageDate=" + messageDate
                 + ", messageTime=" + messageTime + ", messageText=" + messageText + ", messageType=" + messageType
-                + ", messageState=" + messageState + "]";
+                + ", messageState=" + messageState + ", messageSlot=" + messageSlot + "]";
     }
 }

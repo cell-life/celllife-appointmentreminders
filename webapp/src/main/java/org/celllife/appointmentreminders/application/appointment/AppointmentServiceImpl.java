@@ -1,17 +1,21 @@
 package org.celllife.appointmentreminders.application.appointment;
 
-import org.apache.commons.collections.IteratorUtils;
-import org.celllife.appointmentreminders.domain.appointment.Appointment;
-import org.celllife.appointmentreminders.domain.appointment.AppointmentRepository;
-import org.celllife.appointmentreminders.domain.exception.RequiredFieldIsNullException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.Date;
 import java.util.List;
 
+import org.celllife.appointmentreminders.domain.appointment.Appointment;
+import org.celllife.appointmentreminders.domain.appointment.AppointmentRepository;
+import org.celllife.appointmentreminders.domain.exception.RequiredFieldIsNullException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
+    
+    @SuppressWarnings("unused")
+    private static final Logger log = LoggerFactory.getLogger(AppointmentServiceImpl.class);
 
     @Autowired
     AppointmentRepository appointmentRepository;
@@ -21,11 +25,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         if ((appointment.getPatientId() == null) || (appointment.getAppointmentDate() == null) || (appointment.getAppointmentTime() == null)) {
             throw new RequiredFieldIsNullException("PatientId, AppointmentDate and AppointmentTime must all be not null");
-        } else if ((appointment.getId() == null) && (appointmentExists(appointment.getPatientId(),appointment.getAppointmentDate(),appointment.getAppointmentTime()))) {
-            return findByPatientIdAndDateTimeStamp(appointment.getPatientId(),appointment.getAppointmentDate(),appointment.getAppointmentTime()).get(0);
-        } else
+        } else {
             return appointmentRepository.save(appointment);
-
+        }
     }
 
     @Override
@@ -34,13 +36,22 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
+    public Appointment delete(Long appointmentId) {
+        Appointment appointment = get(appointmentId);
+        if (appointment != null) {
+            appointmentRepository.delete(appointmentId);
+        }
+        return appointment;
+    }
+
+    @Override
     public boolean appointmentExists(Long patientId, Date appointmentDate, Date appointmentTime) {
-        return (findByPatientIdAndDateTimeStamp(patientId, appointmentDate, appointmentTime).size() > 0);
+        return appointmentRepository.exists(patientId, appointmentDate, appointmentTime);
     }
 
     @Override
     public List<Appointment> findByPatientIdAndDateTimeStamp(Long patientId, Date appointmentDate, Date appointmentTime) {
-        return IteratorUtils.toList(appointmentRepository.findByPatientIdAndAppointmentDateAndAppointmentTime(patientId, appointmentDate, appointmentTime).iterator());
+        return appointmentRepository.findByPatientIdAndAppointmentDateAndAppointmentTime(patientId, appointmentDate, appointmentTime);
     }
 
 }
