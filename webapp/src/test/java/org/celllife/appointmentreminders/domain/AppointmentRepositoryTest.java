@@ -1,4 +1,4 @@
-package org.celllife.appointmentreminders.domain.application;
+package org.celllife.appointmentreminders.domain;
 
 import java.util.Date;
 import java.util.List;
@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class TestAppointmentRepository extends TestConfiguration {
+public class AppointmentRepositoryTest extends TestConfiguration {
 
     @Autowired
     AppointmentService appointmentService;

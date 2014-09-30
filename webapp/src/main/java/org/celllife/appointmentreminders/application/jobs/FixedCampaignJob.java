@@ -9,6 +9,7 @@ import org.celllife.appointmentreminders.domain.message.Message;
 import org.celllife.appointmentreminders.domain.message.MessageState;
 import org.celllife.appointmentreminders.domain.patient.Patient;
 import org.celllife.appointmentreminders.integration.CommunicateService;
+import org.celllife.mobilisr.client.exception.RestCommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class FixedCampaignJob {
         if (!patient.isSubscribed()) {
             log.debug("Not sending message to patient " + patient.getId() + " because patient is not subscribed.");
             return;
-        } else if (message.getMessageState() == MessageState.SENT) {
+        } else if (message.getMessageState() == MessageState.SENT_TO_COMMUNICATE) {
             log.debug("Not sending message to patient " + patient.getId() + " because message has already been sent.");
             return;
         }
@@ -55,7 +56,7 @@ public class FixedCampaignJob {
         try {
 
             Long communicateId = communicateService.sendOneSms(message);
-            message.setMessageState(MessageState.SENT);
+            message.setMessageState(MessageState.SENT_TO_COMMUNICATE);
             message.setCommunicateId(communicateId);
             message.setMessageSent(new Date());
             try {
@@ -64,9 +65,9 @@ public class FixedCampaignJob {
                 log.warn("Could not save message with ID " + message.getId() + ". Reason: " + e.getMessage(), e);
             }
 
-        } catch (Exception e1) {
+        } catch (RestCommandException e1) {
 
-            message.setMessageState(MessageState.FAILED);
+            message.setMessageState(MessageState.FAILED_SENDING_TO_COMMUNICATE);
             log.warn("Could not send message with ID " + messageId + ". Reason: " + e1.getMessage(), e1);
             try {
                 messageService.save(message);

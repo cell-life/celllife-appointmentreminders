@@ -12,6 +12,8 @@ public interface MessageRepository extends PagingAndSortingRepository<Message, L
     List<Message> findByAppointmentIdAndMessageDateAndMessageTime(Long appointmentId, Date messageDate, Date messageTime);
 
     List<Message> findByMessageStateAndMessageDate(MessageState messageState, Date messageDate);
+
+    List<Message> findByMessageState(MessageState messageState);
     
     @Query("select case when count(m) > 0 then true else false end "
             + "from Message m where m.appointmentId = :appointmentId "

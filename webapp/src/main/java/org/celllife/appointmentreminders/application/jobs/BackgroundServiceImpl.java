@@ -1,20 +1,17 @@
 package org.celllife.appointmentreminders.application.jobs;
 
 import org.celllife.appointmentreminders.application.message.MessageService;
-import org.celllife.appointmentreminders.domain.exception.InvalidDateException;
 import org.celllife.appointmentreminders.domain.exception.RequiredFieldIsNullException;
 import org.celllife.appointmentreminders.domain.message.Message;
 import org.celllife.appointmentreminders.domain.message.MessageState;
-import org.celllife.appointmentreminders.framework.util.DateUtil;
 import org.celllife.appointmentreminders.integration.CommunicateService;
 import org.celllife.mobilisr.client.exception.RestCommandException;
+import org.celllife.mobilisr.constants.SmsStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -29,19 +26,12 @@ public class BackgroundServiceImpl implements BackgroundService {
     @Autowired
     private CommunicateService communicateService;
 
-    @Value("${latest_message_time}")
-    private String latestMessageTime;
-
     @Override
     public void retryFailedMessages() {
 
         log.debug("Checking for failed messages to retry.");
 
-        List<Message> messagesToRetry = messageService.findByMessageStateAndMessageDate(MessageState.FAILED, new Date());
-
-        // if it is too late to retry the message, return
-        if (isTooLate())
-            return;
+        List<Message> messagesToRetry = messageService.findByMessageStateAndMessageDate(MessageState.FAILED_SENDING_TO_COMMUNICATE, new Date());
 
         for (Message message : messagesToRetry) {
 
@@ -50,10 +40,10 @@ public class BackgroundServiceImpl implements BackgroundService {
             try {
                 Long returnedId = communicateService.sendOneSms(message);
                 message.setCommunicateId(returnedId);
-                message.setMessageState(MessageState.SENT);
+                message.setMessageState(MessageState.SENT_TO_COMMUNICATE);
                 message.setMessageSent(new Date());
             } catch (RestCommandException e) {
-                message.setMessageState(MessageState.FAILED);
+                message.setMessageState(MessageState.FAILED_SENDING_TO_COMMUNICATE);
                 log.warn("Could not send message with id " + message.getId() + ". Reason: " + e.getMessage(), e);
             }
             finally {
@@ -69,26 +59,28 @@ public class BackgroundServiceImpl implements BackgroundService {
 
     }
 
-    private boolean isTooLate() {
+    @Override
+    public void updateMessageStatuses() {
 
-        Date dateLatestTime = null;
-        try {
-            dateLatestTime = DateUtil.getTimeFromString(latestMessageTime);
-        } catch (InvalidDateException e) {
-            log.warn("Could not convert latestMessageTime " + dateLatestTime.getTime() + " to a time.");
-            return false;
+        log.debug("Updating message statuses.");
+
+        List<Message> messageList = messageService.findByMessageState(MessageState.SENT_TO_COMMUNICATE);
+
+        for (Message message : messageList) {
+            try {
+                SmsStatus smsStatus = communicateService.getMessageLogStatus(message.getCommunicateId());
+                if (smsStatus == SmsStatus.TX_FAIL) {
+                    message.setMessageState(MessageState.COMMUNICATE_FAILED);
+                } else if (smsStatus == SmsStatus.TX_SUCCESS) {
+                    message.setMessageState(MessageState.COMMUNICATE_DELIVERED);
+                } else {
+                    log.debug("Message " + message.getId() + "'s status on Communicate is " + smsStatus);
+                }
+            } catch (RestCommandException e) {
+                log.warn("Could not get message status from Communicate.",e);
+            }
+
         }
-
-        Calendar now = Calendar.getInstance();
-
-        Calendar latestTime = Calendar.getInstance();
-        latestTime.setTime(dateLatestTime);
-        latestTime.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DATE));
-
-        if (now.getTime().after(latestTime.getTime()))
-            return true;
-        else
-            return false;
 
     }
 

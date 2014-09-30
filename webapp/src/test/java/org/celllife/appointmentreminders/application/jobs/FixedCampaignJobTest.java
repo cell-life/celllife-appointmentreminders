@@ -23,7 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class TestFixedCampaignJob extends TestConfiguration {
+public class FixedCampaignJobTest extends TestConfiguration {
 
     @Autowired
     private FixedCampaignJob fixedCampaignJob;

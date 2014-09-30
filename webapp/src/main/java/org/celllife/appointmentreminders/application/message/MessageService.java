@@ -50,4 +50,15 @@ public interface MessageService {
      */
     List<Message> findByMessageStateAndMessageDate(MessageState messageState, Date messageDate);
 
+    /**
+     * Finds messages by message state.
+     * @param messageState
+     * @return
+     */
+    List<Message> findByMessageState(MessageState messageState);
+
+    /**
+     * Deletes all messages.
+     */
+    void deleteAll();
 }

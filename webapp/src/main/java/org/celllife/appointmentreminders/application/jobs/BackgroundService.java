@@ -7,4 +7,9 @@ public interface BackgroundService {
      */
     void retryFailedMessages();
 
+    /**
+     * This function will poll Communicate and update the messages statuses accordingly.
+     */
+    void updateMessageStatuses();
+
 }

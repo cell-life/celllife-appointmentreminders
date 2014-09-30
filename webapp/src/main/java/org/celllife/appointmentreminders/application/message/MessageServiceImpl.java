@@ -1,8 +1,5 @@
 package org.celllife.appointmentreminders.application.message;
 
-import java.util.Date;
-import java.util.List;
-
 import org.celllife.appointmentreminders.application.quartz.QuartzService;
 import org.celllife.appointmentreminders.domain.exception.AppointmentRemindersException;
 import org.celllife.appointmentreminders.domain.exception.RequiredFieldIsNullException;
@@ -14,6 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -82,6 +82,16 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public List<Message> findByMessageStateAndMessageDate(MessageState messageState, Date messageDate) {
         return messageRepository.findByMessageStateAndMessageDate(messageState, messageDate);
+    }
+
+    @Override
+    public List<Message> findByMessageState(MessageState messageState) {
+        return messageRepository.findByMessageState(messageState);
+    }
+
+    @Override
+    public void deleteAll() {
+        messageRepository.deleteAll();
     }
 
 }

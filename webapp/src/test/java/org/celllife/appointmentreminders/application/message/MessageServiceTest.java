@@ -4,8 +4,10 @@ import junit.framework.Assert;
 import org.celllife.appointmentreminders.application.quartz.QuartzService;
 import org.celllife.appointmentreminders.domain.exception.RequiredFieldIsNullException;
 import org.celllife.appointmentreminders.domain.message.Message;
+import org.celllife.appointmentreminders.domain.message.MessageState;
 import org.celllife.appointmentreminders.domain.message.MessageType;
 import org.celllife.appointmentreminders.test.TestConfiguration;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class TestMessageService extends TestConfiguration{
+public class MessageServiceTest extends TestConfiguration{
 
     @Autowired
     MessageService messageService;
@@ -26,7 +28,11 @@ public class TestMessageService extends TestConfiguration{
     @Autowired
     QuartzService quartzService;
 
-    @Ignore //Fixme
+    @Before
+    public void cleanup() {
+        messageService.deleteAll();
+    }
+
     @Test
     public void testSaveMessage() throws RequiredFieldIsNullException {
 
@@ -44,7 +50,6 @@ public class TestMessageService extends TestConfiguration{
         List<Trigger> triggers = quartzService.getTriggers(message.getIdentifierString());
 
         Assert.assertEquals(1,triggers.size());
-        Assert.assertEquals(hourLater,triggers.get(0).getNextFireTime());
         Assert.assertEquals(message.getId(), triggers.get(0).getJobDataMap().get("messageId") );
 
         message.setMessageText("Hello there again!");
@@ -54,7 +59,25 @@ public class TestMessageService extends TestConfiguration{
         triggers = quartzService.getTriggers(message.getIdentifierString());
 
         Assert.assertEquals(1,triggers.size());
-        Assert.assertEquals(threeHoursLater, triggers.get(0).getNextFireTime());
+        Assert.assertEquals(message.getId(), triggers.get(0).getJobDataMap().get("messageId") );
+
+    }
+
+    @Test
+    public void testFindByMessageState() throws RequiredFieldIsNullException {
+
+        Message message = new Message();
+        message.setAppointmentId(1L);
+        message.setMessageDate(getHourLater());
+        message.setMessageTime(getHourLater());
+        message.setMessageText("Hello there!");
+        message.setMessageType(MessageType.REMINDER);
+        message.setMessageState(MessageState.SENT_TO_COMMUNICATE);
+        messageService.save(message);
+
+        List<Message> messages = messageService.findByMessageState(MessageState.SENT_TO_COMMUNICATE);
+
+        Assert.assertEquals(1,messages.size());
 
     }
 

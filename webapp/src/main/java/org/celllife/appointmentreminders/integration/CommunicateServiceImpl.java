@@ -8,8 +8,10 @@ import org.celllife.appointmentreminders.domain.patient.Patient;
 import org.celllife.mobilisr.api.rest.CampaignDto;
 import org.celllife.mobilisr.api.rest.ContactDto;
 import org.celllife.mobilisr.api.rest.MessageDto;
+import org.celllife.mobilisr.api.rest.MessageLogDto;
 import org.celllife.mobilisr.client.MobilisrClient;
 import org.celllife.mobilisr.client.exception.RestCommandException;
+import org.celllife.mobilisr.constants.SmsStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,5 +65,13 @@ public class CommunicateServiceImpl implements CommunicateService {
         return communicateClient.getCampaignService().createNewCampaign(campaignDto);
 
     }
+
+    @Override
+    public SmsStatus getMessageLogStatus(Long id) throws RestCommandException {
+        MessageLogDto messageLogDto = communicateClient.getMessageLogService().getMessageLog(id);
+        return messageLogDto.getStatus();
+    }
+
+
 
 }

@@ -5,7 +5,7 @@ import org.celllife.appointmentreminders.framework.util.MsisdnUtils;
 import org.celllife.appointmentreminders.test.TestConfiguration;
 import org.junit.Test;
 
-public class TestMsisdnUtils extends TestConfiguration {
+public class MsisdnUtilsTest extends TestConfiguration {
 
     @Test
     public void testIsValidMsisdn() {

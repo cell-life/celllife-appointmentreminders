@@ -27,7 +27,10 @@
             </list>
         </property>
         <property name="triggers">
-            <ref bean="retryMessagesTrigger"/>
+            <list>
+                <ref bean="retryMessagesTrigger"/>
+                <ref bean="updateMessageStatusesTrigger"/>
+            </list>
         </property>
     </bean>
 
@@ -52,6 +55,15 @@
         <property name="repeatInterval" value="3600000"/>
     </bean>
 
+    <bean id="updateMessageStatusesTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="group" value="backgroundServices"/>
+        <property name="jobDetail" ref="updateMessageStatusesJob"/>
+        <!-- 120 seconds -->
+        <property name="startDelay" value="120000"/>
+        <!-- repeat every hour -->
+        <property name="repeatInterval" value="3600000"/>
+    </bean>
+
     <!--Jobs-->
 
     <bean name="fixedCampaignJobRunner" class="org.quartz.impl.JobDetailImpl">
@@ -72,11 +84,28 @@
         <property name="jobDataMap" ref="mapForRetryMessagesJob"/>
     </bean>
 
+    <bean name="updateMessageStatusesJob" class="org.quartz.impl.JobDetailImpl">
+        <property name="durability" value="true"/>
+        <property name="group" value="backgroundServices"/>
+        <property name="name" value="updateMessageStatuses"/>
+        <property name="jobClass" value="org.celllife.appointmentreminders.application.jobs.AppointmentReminderJobBean"/>
+        <property name="jobDataMap" ref="mapForUpdateMessageStatusesJob"/>
+    </bean>
+
     <bean name="mapForRetryMessagesJob" class="org.quartz.JobDataMap">
         <constructor-arg>
             <map>
                 <entry key="beanName" value="backgroundServices"/>
                 <entry key="methodName" value="retryFailedMessages"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean name="mapForUpdateMessageStatusesJob" class="org.quartz.JobDataMap">
+        <constructor-arg>
+            <map>
+                <entry key="beanName" value="backgroundServices"/>
+                <entry key="methodName" value="updateMessageStatuses"/>
             </map>
         </constructor-arg>
     </bean>

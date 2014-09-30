@@ -51,4 +51,8 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="message-8" author="dine@cell-life.org">
+        <modifyDataType tableName="message" columnName="message_state" newDataType="VARCHAR(31)"/>
+    </changeSet>
+
 </databaseChangeLog>

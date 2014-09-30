@@ -497,13 +497,13 @@
             <dependency>
                 <groupId>org.celllife.mobilisr</groupId>
                 <artifactId>org.celllife.mobilisr.client</artifactId>
-                <version>2.13</version>
+                <version>2.15-SNAPSHOT</version> <!--FIXME-->
             </dependency>
 
             <dependency>
                 <groupId>org.celllife.mobilisr</groupId>
                 <artifactId>org.celllife.mobilisr.api</artifactId>
-                <version>2.13</version>
+                <version>2.15-SNAPSHOT</version> <!--FIXME-->
             </dependency>
             
             <!-- Cell-Life Security -->
