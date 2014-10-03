@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class PatientServiceImplTest extends TestConfiguration{
+public class PatientServiceTest extends TestConfiguration {
 
     @Autowired
     PatientService patientService;
@@ -65,7 +65,8 @@ public class PatientServiceImplTest extends TestConfiguration{
             }
         }
     }
-    
+
+    @Test
     public void testFindByClinicCode() throws Exception {
         Long clinicId = null;
         Long patient1Id = null;

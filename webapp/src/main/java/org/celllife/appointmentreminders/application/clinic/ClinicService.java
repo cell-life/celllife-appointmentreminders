@@ -37,4 +37,9 @@ public interface ClinicService {
      */
     Clinic findClinicByCode(String code) throws ClinicCodeNonexistentException;
 
+    /**
+     * Deletes all clinics in the database.
+     */
+    public void deleteAllClinics();
+
 }

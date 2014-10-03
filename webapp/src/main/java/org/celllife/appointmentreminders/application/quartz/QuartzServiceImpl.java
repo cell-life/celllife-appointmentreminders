@@ -26,17 +26,6 @@ public class QuartzServiceImpl implements QuartzService {
     @Qualifier("qrtzScheduler")
     private Scheduler scheduler;
 
-    public String generateCronExprForDailyOccurence(Date msgDateTime) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(msgDateTime);
-
-        String cronExpr = MessageFormat.format(DAILY_CRONEXPR, new Object[]{
-                calendar.get(Calendar.SECOND), calendar.get(Calendar.MINUTE),
-                calendar.get(Calendar.HOUR_OF_DAY)});
-
-        return cronExpr;
-    }
-
     @Override
     public void clearTriggersForGroup(String triggerGroup) {
 
@@ -112,22 +101,6 @@ public class QuartzServiceImpl implements QuartzService {
     }
 
     @Override
-    public void removeTrigger(String triggerName, String triggerGroup) throws SchedulerException {
-        TriggerKey triggerKey = findByTriggerNameAndTriggerGroup(triggerName, triggerGroup);
-        if (triggerKey != null) {
-            scheduler.unscheduleJob(triggerKey);
-        } else {
-            log.warn("Could not remove trigger " + triggerName + " in group " + triggerGroup + " because it was not found.");
-        }
-    }
-
-    @Override
-    public void addTrigger(Trigger trigger) throws SchedulerException {
-        scheduler.scheduleJob(trigger);
-
-    }
-
-    @Override
     public Scheduler getScheduler() {
         return scheduler;
     }
@@ -188,6 +161,12 @@ public class QuartzServiceImpl implements QuartzService {
         catch (SchedulerException e) {
             throw new AppointmentRemindersException("Error scheduling message. Cause: " + e.getMessage());
         }
+    }
+
+    private Date getHourLater() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR_OF_DAY,1);
+        return calendar.getTime();
     }
 
 }

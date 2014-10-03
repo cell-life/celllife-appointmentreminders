@@ -64,14 +64,117 @@ public class MessageServiceTest extends TestConfiguration{
     }
 
     @Test
+    public void testSaveMessage_MessageDateTimeExists() throws RequiredFieldIsNullException {
+
+        Date hourLater = getHourLater();
+
+        Message message = new Message();
+        message.setAppointmentId(1L);
+        message.setMessageDate(hourLater);
+        message.setMessageTime(hourLater);
+        message.setMessageText("Hello there!");
+        message.setMessageType(MessageType.REMINDER);
+        messageService.save(message);
+
+        Message message1 = new Message();
+        message1.setAppointmentId(1L);
+        message1.setMessageDate(hourLater);
+        message1.setMessageTime(hourLater);
+        message1.setMessageText("Hello there again!");
+        message1.setMessageType(MessageType.REMINDER);
+        message1 = messageService.save(message1);
+
+        Assert.assertEquals(1,messageService.getAllMessages().size());
+        Assert.assertEquals("Hello there again!",messageService.getAllMessages().get(0).getMessageText());
+
+        List<Trigger> triggers = quartzService.getTriggers(message1.getIdentifierString());
+
+        Assert.assertEquals(1,triggers.size());
+
+    }
+
+    @Test
+    public void testSaveMessage_MessageInPast() throws RequiredFieldIsNullException {
+
+        Message message = new Message();
+        message.setAppointmentId(1L);
+        message.setMessageDate(getHourBefore());
+        message.setMessageTime(getHourBefore());
+        message.setMessageText("Hello there!");
+        message.setMessageType(MessageType.REMINDER);
+        message = messageService.save(message);
+
+        List<Trigger> triggers = quartzService.getTriggers(message.getIdentifierString());
+
+        Assert.assertEquals(1,triggers.size());
+        Assert.assertEquals(message.getId(), triggers.get(0).getJobDataMap().get("messageId"));
+        Assert.assertTrue(triggers.get(0).getNextFireTime().after(new Date()));
+
+        message = new Message();
+        message.setAppointmentId(1L);
+        message.setMessageDate(getHourAndDayBefore());
+        message.setMessageTime(getHourAndDayBefore());
+        message.setMessageText("Hello there again!");
+        message.setMessageType(MessageType.REMINDER);
+        message = messageService.save(message);
+
+        triggers = quartzService.getTriggers(message.getIdentifierString());
+
+        Assert.assertEquals(0,triggers.size());
+
+    }
+
+    @Test (expected=RequiredFieldIsNullException.class)
+    public void testSaveMessage_EmptyTime() throws RequiredFieldIsNullException {
+
+        Date hourLater = getHourLater();
+
+        Message message = new Message();
+        message.setAppointmentId(1L);
+        message.setMessageDate(hourLater);
+        message.setMessageText("Hello there!");
+        message.setMessageType(MessageType.REMINDER);
+        messageService.save(message);
+
+    }
+
+    @Test (expected = RequiredFieldIsNullException.class)
+    public void testSaveMessage_EmptyDate() throws RequiredFieldIsNullException {
+
+        Date hourLater = getHourLater();
+
+        Message message = new Message();
+        message.setAppointmentId(1L);
+        message.setMessageTime(hourLater);
+        message.setMessageText("Hello there!");
+        message.setMessageType(MessageType.REMINDER);
+        messageService.save(message);
+
+    }
+
+    @Test (expected = RequiredFieldIsNullException.class)
+    public void testSaveMessage_EmptyText() throws RequiredFieldIsNullException {
+
+        Date hourLater = getHourLater();
+
+        Message message = new Message();
+        message.setAppointmentId(1L);
+        message.setMessageTime(hourLater);
+        message.setMessageDate(hourLater);
+        message.setMessageText("");
+        message.setMessageType(MessageType.REMINDER);
+        messageService.save(message);
+
+    }
+
+    @Test
     public void testFindByMessageState() throws RequiredFieldIsNullException {
 
         Message message = new Message();
         message.setAppointmentId(1L);
-        message.setMessageDate(getHourLater());
-        message.setMessageTime(getHourLater());
+        message.setMessageDate(getHourAndDayBefore());
+        message.setMessageTime(getHourAndDayBefore());
         message.setMessageText("Hello there!");
-        message.setMessageType(MessageType.REMINDER);
         message.setMessageState(MessageState.SENT_TO_COMMUNICATE);
         messageService.save(message);
 
@@ -84,6 +187,19 @@ public class MessageServiceTest extends TestConfiguration{
     private Date getHourLater() {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY,1);
+        return calendar.getTime();
+    }
+
+    private Date getHourBefore() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR_OF_DAY,-1);
+        return calendar.getTime();
+    }
+
+    private Date getHourAndDayBefore() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR_OF_DAY,-1);
+        calendar.add(Calendar.DATE,-1);
         return calendar.getTime();
     }
 

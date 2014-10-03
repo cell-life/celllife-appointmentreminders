@@ -18,6 +18,12 @@ public interface MessageService {
     Message save(Message message) throws RequiredFieldIsNullException;
 
     /**
+     * Gets all messages from the database.
+     * @return A list of Message entities.
+     */
+    List<Message> getAllMessages();
+
+    /**
      * Gets a message by id.
      * @param id
      * @return

@@ -40,10 +40,23 @@ public class FixedCampaignJob {
 
         Message message = messageService.getMessage(messageId);
 
-        log.info("Now sending message with ID " + messageId);
+        log.info("Now sending message with id " + messageId);
 
-        Appointment appointment = appointmentService.get(message.getAppointmentId());
-        Patient patient = patientService.get(appointment.getPatientId());
+        Appointment appointment;
+        try {
+            appointment = appointmentService.get(message.getAppointmentId());
+        } catch (NullPointerException e) {
+            log.warn("Could not find appointment with id " + message.getAppointmentId() + ". Cannot send message with id " + messageId);
+            return;
+        }
+
+        Patient patient;
+        try {
+            patient = patientService.get(appointment.getPatientId());
+        } catch (NullPointerException e) {
+            log.warn("Could not find patient with id " + appointment.getPatientId() + ". Cannot send message with id " + messageId);
+            return;
+        }
 
         if (!patient.isSubscribed()) {
             log.debug("Not sending message to patient " + patient.getId() + " because patient is not subscribed.");

@@ -56,7 +56,7 @@ public class CommunicateServiceImpl implements CommunicateService {
 
         CampaignDto campaignDto = new CampaignDto();
         campaignDto.setType("FIXED");
-        campaignDto.setName("Appointment Reminder " + new Date());
+        campaignDto.setName("Appointment-Reminder-Message-" + message.getId() + "-" + new Date());
         campaignDto.setMessages(messageDtoList);
         campaignDto.setContacts(contactDtoList);
         campaignDto.setDuration(1);

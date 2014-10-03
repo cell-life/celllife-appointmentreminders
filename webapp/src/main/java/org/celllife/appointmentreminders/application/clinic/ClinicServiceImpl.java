@@ -52,4 +52,9 @@ public class ClinicServiceImpl implements ClinicService{
 
     }
 
+    @Override
+    public void deleteAllClinics() {
+        clinicRepository.deleteAll();
+    }
+
 }

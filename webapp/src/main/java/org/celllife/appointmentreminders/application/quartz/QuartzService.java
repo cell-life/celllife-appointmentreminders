@@ -30,28 +30,6 @@ public interface QuartzService {
     List<Trigger> getTriggers(String triggerGroup);
 
     /**
-     * Adds a quartz trigger.
-     * @param trigger Trigger to add.
-     * @throws Exception
-     */
-    void addTrigger(Trigger trigger) throws SchedulerException;
-
-    /**
-     * Removes a quartz trigger.
-     * @param triggerName Name of the trigger.
-     * @param triggerGroup Name of the quartz trigger group.
-     * @throws org.quartz.SchedulerException
-     */
-    void removeTrigger(String triggerName, String triggerGroup) throws SchedulerException;
-
-    /**
-     * Generates a Cron expression for a daily occurrence.
-     * @param msgDateTime
-     * @return
-     */
-    String generateCronExprForDailyOccurence(Date msgDateTime);
-
-    /**
      * Get the scheduler for the quartz service.
      * @return Scheduler for the quartz service.
      */
