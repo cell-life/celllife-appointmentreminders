@@ -46,7 +46,7 @@ public class FixedCampaignJob {
         try {
             appointment = appointmentService.get(message.getAppointmentId());
         } catch (NullPointerException e) {
-            log.warn("Could not find appointment with id " + message.getAppointmentId() + ". Cannot send message with id " + messageId);
+            log.warn("Could not find appointment. Cannot send message with id " + messageId);
             return;
         }
 
@@ -54,7 +54,7 @@ public class FixedCampaignJob {
         try {
             patient = patientService.get(appointment.getPatientId());
         } catch (NullPointerException e) {
-            log.warn("Could not find patient with id " + appointment.getPatientId() + ". Cannot send message with id " + messageId);
+            log.warn("Could not find patient with id. Cannot send message with id " + messageId);
             return;
         }
 

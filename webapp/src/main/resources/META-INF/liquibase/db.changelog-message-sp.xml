@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet author="dine@cell-life.org" id="message-sp-1" failOnError="false" context="prod">
+        <comment>Create stored procedure.</comment>
+        <sql>DROP PROCEDURE IF EXISTS FindMessageStatuses</sql>
+        <sql splitStatements="false" stripComments="false">
+
+            <![CDATA[
+            CREATE PROCEDURE FindMessageStatuses(in clinicId BIGINT)
+            BEGIN
+
+            DECLARE x BIGINT;
+            DECLARE y BIGINT;
+            DECLARE arraySize INTEGER DEFAULT 0;
+            DECLARE countMissed BIGINT;
+            DECLARE countReminder BIGINT;
+            DECLARE countTotal BIGINT;
+            DECLARE attended INT;
+            DECLARE statusVariable VARCHAR(32);
+            DECLARE msisdn VARCHAR(15);
+            DECLARE appointmentId BIGINT;
+            # We want a row for each appointment.
+            DECLARE curs CURSOR FOR (SELECT p.msisdn, m.appointment_id FROM message m, appointment a, patient p WHERE m.appointment_id=a.id and a.patient_id=p.id and p.clinic_id=clinicId group by m.appointment_id);
+
+            # Find the max number of missed appointment messages per appointment
+            SET countMissed = (SELECT MAX(count) FROM
+            (SELECT count(*) as count,message_type FROM message m, appointment a, patient p WHERE m.appointment_id=a.id and a.patient_id=p.id and p.clinic_id=clinicId group by message_type,appointment_id)
+            as max
+            where (message_type='MISSED'));
+            # Find the max number of appointment reminder messages per appointment
+            SET countReminder = (SELECT MAX(count) FROM
+            (SELECT count(*) as count,message_type FROM message m, appointment a, patient p WHERE m.appointment_id=a.id and a.patient_id=p.id and p.clinic_id=clinicId group by message_type,appointment_id)
+            as max
+            where (message_type='REMINDER'));
+            SET countTotal = countMissed + countReminder;
+            SET arraySize = (SELECT count(distinct(p.msisdn)) as msisdn FROM message m, appointment a, patient p WHERE m.appointment_id=a.id and a.patient_id=p.id and p.clinic_id=clinicId);
+            SET SQL_SAFE_UPDATES = 0;
+
+            DROP TEMPORARY TABLE IF EXISTS resultsTable;
+            CREATE TEMPORARY TABLE IF NOT EXISTS resultsTable AS SELECT p.msisdn, a.id as appointment_id, a.appointment_date,p.patient_code FROM message m, appointment a, patient p WHERE m.appointment_id=a.id and a.patient_id=p.id and p.clinic_id=clinicId group by m.appointment_id order by p.patient_code;
+
+            # Add a column for each reminder message
+            SET x = 1;
+            WHILE x <= (countReminder) DO
+            SET @sql = CONCAT('ALTER TABLE resultsTable add REMINDER', x, ' VARCHAR(32);');
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+            SET x = x+1;
+            END WHILE;
+
+            # Add a column for each missed appointment message
+            SET x = 1;
+            WHILE x <= (countMissed) DO
+            SET @sql = CONCAT('ALTER TABLE resultsTable add MISSED', x, ' VARCHAR(32);');
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+            SET x = x+1;
+            END WHILE;
+
+            SET y = 1;
+            OPEN curs;
+            msisdn_loop : LOOP FETCH curs INTO msisdn,appointmentId;
+
+            SET @sql = CONCAT('select attended into @c1 from appointment where id=',appointmentId);
+            SET @c1 = '';
+            PREPARE stmt1 FROM @sql;
+            EXECUTE stmt1;
+            DEALLOCATE PREPARE stmt1;
+            SET attended = @c1;
+
+            # if the person attended the appointment, then fill in the 'MISSED' messages columns with 'ATTENDED'
+            if attended = 1 THEN
+
+            SET x = 1;
+            WHILE x <= (countMissed) DO
+            SET @sql = CONCAT('UPDATE resultsTable set MISSED', x, ' = "ATTENDED" where msisdn=',msisdn,' and appointment_id=', appointmentId,';');
+            PREPARE stmt FROM @sql;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+            SET x = x+1;
+            END WHILE;
+
+            END IF;
+
+            # For each appointment, set the columns to the corresponding message_state value.
+            BLOCK2: BEGIN
+
+            DECLARE z int;
+            DECLARE done INT DEFAULT 0;
+            DECLARE statusCursor cursor for (select m.message_state from message m, appointment a, patient p where p.msisdn=msisdn and m.appointment_id=appointmentId and m.appointment_id=a.id and a.patient_id=p.id and m.message_type='REMINDER' order by message_date asc);
+            DECLARE statusCursorMissed cursor for (select m.message_state from message m, appointment a, patient p where p.msisdn=msisdn and m.appointment_id=appointmentId and m.appointment_id=a.id and a.patient_id=p.id and m.message_type='MISSED' order by message_date asc);
+            DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+            set z = 1;
+
+            OPEN statusCursor;
+            status_loop: LOOP FETCH statusCursor INTO statusVariable;
+
+            IF done = 1 THEN
+            LEAVE status_loop;
+            END IF;
+
+            SET @sql = CONCAT('UPDATE resultsTable set REMINDER', z, ' = "',statusVariable,'" where msisdn=',msisdn,' and appointment_id=', appointmentId,';');
+            PREPARE stmt2 FROM @sql;
+            EXECUTE stmt2;
+            DEALLOCATE PREPARE stmt2;
+
+            IF z = countReminder THEN
+            LEAVE status_loop;
+            END IF;
+
+            set z = z+1;
+
+            END LOOP status_loop;
+            CLOSE statusCursor;
+
+            set z = 1;
+            set done = 0;
+            OPEN statusCursorMissed;
+            status_loop: LOOP FETCH statusCursorMissed INTO statusVariable;
+
+            IF done = 1 THEN
+            LEAVE status_loop;
+            END IF;
+
+            SET @sql = CONCAT('UPDATE resultsTable set MISSED', z, ' = "',statusVariable,'" where msisdn=',msisdn,' and appointment_id=', appointmentId,';');
+            PREPARE stmt2 FROM @sql;
+            EXECUTE stmt2;
+            DEALLOCATE PREPARE stmt2;
+
+            IF z = countMissed THEN
+            LEAVE status_loop;
+            END IF;
+
+            set z = z+1;
+
+            END LOOP status_loop;
+            CLOSE statusCursorMissed;
+
+            END BLOCK2;
+
+            IF y > arraySize THEN
+            LEAVE msisdn_loop;
+            END IF;
+            SET y = y+1;
+
+            END loop msisdn_loop;
+            CLOSE curs;
+
+            SET SQL_SAFE_UPDATES = 1;
+
+            SELECT * from resultsTable;
+
+            END
+            ]]>
+
+        </sql>
+    </changeSet>
+</databaseChangeLog>
+

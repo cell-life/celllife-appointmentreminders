@@ -618,6 +618,13 @@
             <artifactId>celllife-security</artifactId>
         </dependency>
 
+        <!-- Super CSV -->
+
+        <dependency>
+            <groupId>net.sf.supercsv</groupId>
+            <artifactId>super-csv</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
