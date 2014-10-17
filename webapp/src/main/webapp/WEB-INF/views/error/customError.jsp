@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"  %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -22,11 +23,11 @@
 
     <div class="masthead">
         <ul class="nav nav-pills pull-right">
-            <li><a href="">Home</a></li>
+            <li class="active"><a href="#">Home</a></li>
             <li><a href="j_spring_cas_security_logout">Logout</a>
         </ul>
          <h2><img src="resources/img/logo.png"></h2>
-        <h3 class="muted">appointment reminders</h3>
+        <h3 class="muted">Appointment Reminders</h3>
     </div>
 
     <hr>
@@ -40,7 +41,8 @@
  <hr>
 
     <div class="footer">
-        <p>&copy; Cell-Life (NPO) - 2013</p>
+        <jsp:useBean id="date" class="java.util.Date" />
+        <p>&copy; Cell-Life (NPO) - <fmt:formatDate value="${date}" pattern="yyyy" /></p>
     </div>
 
 </div>

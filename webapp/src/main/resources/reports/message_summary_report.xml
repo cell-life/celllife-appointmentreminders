@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pconfig xmlns="http://www.cell-life.org/schemas/pconfig"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.cell-life.org/schemas/pconfig http://www.cell-life.org/schemas/pconfig/pconfig-1.0.xsd">
+	<id>message_summary_report</id>
+	<label>Message Summary Report</label>
+	<resource>message_summary_report.jasper</resource>
+    <parameters>
+      <!-- dates -->
+		<date name="start_date" label="Start date" allowFuture="false" optional="true" />
+		<label value="If not set the start date will default to the beginning of the previous month." /> 
+		<date name="end_date" label="End date" allowFuture="false" optional="true" />
+		<label value="If not set the end date will default to the end of the previous month." /> 
+		<text name="facility_code" label="Facility code" defaultValue="0000" optional="false" />
+		<label value="Enter the unique code for the facility." />
+    </parameters>
+</pconfig>

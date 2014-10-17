@@ -11,6 +11,7 @@
     <!--Tell the servlet where to look for annotated methods-->
     <context:component-scan base-package="org.celllife.appointmentreminders.interfaces.web"/>
     <context:component-scan base-package="org.celllife.appointmentreminders.interfaces.service"/>
+    <context:component-scan base-package="org.celllife.reporting.framework.interfaces.web"/>
     
     <!-- Load the security UserController for updating and resetting passwords -->
     <bean id="clinicSecurityUserService" class="org.celllife.appointmentreminders.domain.clinic.ClinicSecurityUserService"/>
