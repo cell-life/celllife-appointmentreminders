@@ -52,7 +52,7 @@ public class CSVReportsController {
     public void downloadCSVReport(HttpServletRequest request, HttpServletResponse response) throws Exception {
         
         String reportId = request.getParameter("reportId");
-        if (reportId.isEmpty()) {
+        if (reportId == null || reportId.isEmpty()) {
             throw new RuntimeException("Could not retrieve a report with an empty reportId.");
         }
 
@@ -80,27 +80,26 @@ public class CSVReportsController {
         }
 
         try {
+            
+            response.setContentType("application/csv");
+            response.setHeader("Content-Disposition", "attachment; filename=\"messageReport" + new Date() + ".csv\"");
 
             if (numberOfRows > 0) {
-
-                response.setContentType("application/csv");
-                response.setHeader("Content-Disposition", "attachment; filename=\"messageReport" + new Date() + ".csv\"");
-
                 ICsvMapWriter writer = new CsvMapWriter(new OutputStreamWriter(new BufferedOutputStream(response.getOutputStream())), CsvPreference.STANDARD_PREFERENCE);
-
-                final String[] header = new String[numberOfRows];
-                rows.get(0).keySet().toArray(header);
-                writer.writeHeader(header);
-
-                for (Map<String, Object> row : rows) {
-                    writer.write(row, header, getProcessors(numberOfRows));
+                try {
+                    final String[] header = new String[numberOfRows];
+                    rows.get(0).keySet().toArray(header);
+                    writer.writeHeader(header);
+    
+                    for (Map<String, Object> row : rows) {
+                        writer.write(row, header, getProcessors(numberOfRows));
+                    }
+                } finally {
+                    writer.close();
                 }
-                writer.close();
-
             } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                log.warn("No data found for message report of clinic. Could not generate report for facility with code "
-                        + facilityCode + " between " + startDate + " and " + endDate);
+                log.warn("No data found for message report of facility with code " + facilityCode + " between "
+                        + startDate + " and " + endDate);
             }
 
         } catch (IOException | NullPointerException e) {
