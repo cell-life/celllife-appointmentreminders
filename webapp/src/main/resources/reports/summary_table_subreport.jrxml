@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="summary_table_subreport" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="cal" class="java.util.Calendar" isForPrompting="false">
+		<defaultValueExpression><![CDATA[Calendar.getInstance()]]></defaultValueExpression>
+	</parameter>
+	<parameter name="start_date" class="java.util.Date">
+		<defaultValueExpression><![CDATA[(
+    $P{cal}.add(java.util.Calendar.MONTH, -1) ||
+    $P{cal}.set(java.util.Calendar.DAY_OF_MONTH, 1)
+)
+? null : $P{cal}.getTime()]]></defaultValueExpression>
+	</parameter>
+	<parameter name="end_date" class="java.util.Date">
+		<defaultValueExpression><![CDATA[(
+$P{cal}.set(java.util.Calendar.DAY_OF_MONTH, $P{cal}.getActualMaximum(java.util.Calendar.DAY_OF_MONTH))
+)
+? null : $P{cal}.getTime()]]></defaultValueExpression>
+	</parameter>
+	<parameter name="facility_code" class="java.lang.String">
+		<defaultValueExpression><![CDATA["0000"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select subscribed.total as subscribed, unsubscribed.total as unsubscribed, reminders_sent.total as reminders_sent, missed_sent.total as missed_sent, attended.total as attended, unattended.total as unattended
+from
+ (select count(*) as 'total'
+  from patient p, clinic c
+  where subscribed = 1
+  and p.clinic_id = c.id and c.code=$P{facility_code}) as subscribed,
+ (select count(*) as 'total'
+  from patient p, clinic c
+  where subscribed = 0
+  and p.clinic_id = c.id and c.code=$P{facility_code}) as unsubscribed,
+ (select count(*) as 'total'
+  from message m1, appointment a1, patient p1, clinic c1
+  where m1.message_type = 'REMINDER'
+  and m1.appointment_id = a1.id
+  and a1.patient_id = p1.id and p1.clinic_id = c1.id
+  and c1.code=$P{facility_code}
+  and a1.appointment_date between $P{start_date} and $P{end_date}) as reminders_sent,
+ (select count(*) as 'total'
+  from message m2, appointment a2, patient p2, clinic c2
+  where m2.message_type = 'MISSED'
+  and m2.appointment_id = a2.id
+  and a2.patient_id = p2.id and p2.clinic_id = c2.id
+  and c2.code=$P{facility_code}
+  and a2.appointment_date between $P{start_date} and $P{end_date}) as missed_sent,
+ (select count(*) as 'total'
+  from appointment a1, patient p1, clinic c1
+  where a1.attended=1
+  and a1.patient_id = p1.id and p1.clinic_id = c1.id
+  and c1.code=$P{facility_code}
+  and a1.appointment_date between $P{start_date} and $P{end_date}) as attended,
+ (select count(*) as 'total'
+  from appointment a1, patient p1, clinic c1
+  where a1.attended=0
+  and a1.patient_id = p1.id and p1.clinic_id = c1.id
+  and c1.code=$P{facility_code}
+  and a1.appointment_date between $P{start_date} and $P{end_date}) as unattended
+
+;]]>
+	</queryString>
+	<field name="subscribed" class="java.lang.Number"/>
+	<field name="unsubscribed" class="java.lang.Number"/>
+	<field name="reminders_sent" class="java.lang.Number"/>
+	<field name="missed_sent" class="java.lang.Number"/>
+	<field name="attended" class="java.lang.Number"/>
+	<field name="unattended" class="java.lang.Number"/>
+	<title>
+		<band height="185" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="1" width="450" height="29"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="450" y="1" width="105" height="29"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="450" y="30" width="105" height="29"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="30" width="450" height="29"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="88" width="450" height="29"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="450" y="59" width="105" height="29"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="450" y="88" width="105" height="29"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="59" width="450" height="29"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="146" width="450" height="29"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="450" y="117" width="105" height="29"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="450" y="146" width="105" height="29"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="117" width="450" height="29"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="13" y="4" width="437" height="26"/>
+				<textElement>
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Patients subscribed]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="13" y="17" width="437" height="20"/>
+				<textElement>
+					<font size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Number of patients currently subscribed to receiving appointment reminders.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="450" y="1" width="105" height="29"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{subscribed}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="13" y="33" width="437" height="26"/>
+				<textElement>
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Patients unsubscribed]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="13" y="45" width="437" height="20"/>
+				<textElement>
+					<font size="10" isBold="false" isItalic="true" />
+				</textElement>
+				<text><![CDATA[Number of patients currently unsubscribed from receiving appointment reminders.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="450" y="30" width="105" height="29"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{unsubscribed}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="13" y="62" width="437" height="26"/>
+				<textElement>
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Appointment reminders sent]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="13" y="74" width="437" height="20"/>
+				<textElement>
+					<font size="9" isItalic="true" />
+				</textElement>
+				<text><![CDATA[Number of appointment reminder messages sent (can be multiple per appointment).]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="450" y="59" width="105" height="29"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{reminders_sent}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="13" y="91" width="437" height="26"/>
+				<textElement>
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Missed appointment reminders sent]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="13" y="103" width="437" height="20"/>
+				<textElement>
+					<font size="9" isItalic="true" />
+				</textElement>
+				<text><![CDATA[Number of missed appointment messages sent (can be multiple per appointment).]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="450" y="88" width="105" height="29"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{missed_sent}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="13" y="120" width="437" height="26"/>
+				<textElement>
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Patients attended appointment]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="13" y="132" width="437" height="20"/>
+				<textElement>
+					<font size="9" isItalic="true" />
+				</textElement>
+				<text><![CDATA[Number of patients that attended their appointment.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="450" y="117" width="105" height="29"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{attended}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="13" y="149" width="437" height="26"/>
+				<textElement>
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Patients missed appointment]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="13" y="161" width="437" height="20"/>
+				<textElement>
+					<font size="9" isItalic="true" />
+				</textElement>
+				<text><![CDATA[Number of patients that missed their appointment.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="450" y="146" width="105" height="29"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{unattended}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+</jasperReport>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="summary_messagesentchart_subreport" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="cal" class="java.util.Calendar" isForPrompting="false">
+		<defaultValueExpression><![CDATA[Calendar.getInstance()]]></defaultValueExpression>
+	</parameter>
+	<parameter name="start_date" class="java.util.Date">
+		<defaultValueExpression><![CDATA[(
+    $P{cal}.add(java.util.Calendar.MONTH, -1) ||
+    $P{cal}.set(java.util.Calendar.DAY_OF_MONTH, 1)
+)
+? null : $P{cal}.getTime()]]></defaultValueExpression>
+	</parameter>
+	<parameter name="end_date" class="java.util.Date">
+		<defaultValueExpression><![CDATA[(
+$P{cal}.set(java.util.Calendar.DAY_OF_MONTH, $P{cal}.getActualMaximum(java.util.Calendar.DAY_OF_MONTH))
+)
+? null : $P{cal}.getTime()]]></defaultValueExpression>
+	</parameter>
+	<parameter name="facility_code" class="java.lang.String">
+		<defaultValueExpression><![CDATA["0000"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select combined.month_name as month, SUM(combined.reminder) as reminder, SUM(combined.missed) as missed, SUM(combined.appointments) as appointments, SUM(combined.all_msg) as all_msg
+ from
+ (select MONTH(m1.message_date) as month, MONTHNAME(m1.message_date) as month_name, count(m1.id) as reminder, 0 as missed, 0 as appointments, 0 as all_msg
+   from message m1, appointment a1, patient p1, clinic c1
+   where m1.message_type = 'REMINDER'
+   and m1.message_date between $P{start_date} and $P{end_date}
+   and c1.code = $P{facility_code}
+   and m1.appointment_id = a1.id and a1.patient_id = p1.id and p1.clinic_id = c1.id
+   group by month, month_name
+  union
+  select MONTH(m1.message_date) as month, MONTHNAME(m1.message_date) as month_name, 0 as reminder, count(m1.id) as missed, 0 as appointments, 0 as all_msg
+   from message m1, appointment a1, patient p1, clinic c1
+   where m1.message_type = 'MISSED'
+   and m1.message_date between $P{start_date} and $P{end_date}
+   and c1.code = $P{facility_code}
+   and m1.appointment_id = a1.id and a1.patient_id = p1.id and p1.clinic_id = c1.id
+   group by month, month_name
+  union
+  select MONTH(a1.appointment_date) as month, MONTHNAME(a1.appointment_date) as month_name, 0 as reminder, 0 as missed, count(a1.id) as appointments, 0 as all_msg
+   from appointment a1, patient p1, clinic c1
+   where a1.appointment_date between $P{start_date} and $P{end_date}
+   and c1.code = $P{facility_code}
+   and a1.patient_id = p1.id and p1.clinic_id = c1.id
+   group by month, month_name
+  union
+  select MONTH(m1.message_date) as month, MONTHNAME(m1.message_date) as month_name, 0 as reminder, 0 as missed, 0 as appointments, count(m1.id) as all_msg
+   from message m1, appointment a1, patient p1, clinic c1
+   where m1.message_date between $P{start_date} and $P{end_date}
+   and c1.code = $P{facility_code}
+   and m1.appointment_id = a1.id and a1.patient_id = p1.id and p1.clinic_id = c1.id
+   group by month, month_name
+ ) as combined
+ group by combined.month_name
+ order by combined.month
+;]]>
+	</queryString>
+	<field name="month" class="java.lang.String"/>
+	<field name="reminder" class="java.lang.Number"/>
+	<field name="missed" class="java.lang.Number"/>
+	<field name="appointments" class="java.lang.Number"/>
+	<field name="all_msg" class="java.lang.Number"/>
+	<title>
+		<band height="206" splitType="Stretch">
+			<lineChart>
+				<chart evaluationTime="Report">
+					<reportElement x="0" y="0" width="555" height="206">
+						<property name="net.sf.jasperreports.chart.range.axis.integer.unit" value="true"/>
+					</reportElement>
+					<chartTitle>
+						<font size="12" isBold="true"/>
+						<titleExpression><![CDATA["Messages sent"]]></titleExpression>
+					</chartTitle>
+					<chartSubtitle>
+						<font size="10" isItalic="true"/>
+						<subtitleExpression><![CDATA["Number of messages sent over the last six months."]]></subtitleExpression>
+					</chartSubtitle>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<!--<categorySeries>
+						<seriesExpression><![CDATA["All"]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{month}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{all_msg}]]></valueExpression>
+					</categorySeries>-->
+					<categorySeries>
+						<seriesExpression><![CDATA["Reminder"]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{month}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{reminder}]]></valueExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["Missed"]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{month}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{missed}]]></valueExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["Appointments"]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{month}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{appointments}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<linePlot isShowLines="true" isShowShapes="true">
+					<plot/>
+				</linePlot>
+			</lineChart>
+		</band>
+	</title>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+</jasperReport>

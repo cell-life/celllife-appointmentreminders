@@ -162,6 +162,11 @@
                         <version>${jasperreports.version}</version>
                     </dependency>
                     <dependency>
+                        <groupId>net.sf.jasperreports</groupId>
+                        <artifactId>jasperreports-fonts</artifactId>
+                        <version>${jasperreports.version}</version>
+                    </dependency>
+                    <dependency>
                         <groupId>ch.qos.logback</groupId>
                         <artifactId>logback-classic</artifactId>
                         <version>1.0.10</version>
@@ -269,10 +274,15 @@
             <groupId>org.celllife.report</groupId>
             <artifactId>celllife-report-reporting</artifactId>
         </dependency>
-        
         <dependency>
             <groupId>org.celllife.report</groupId>
             <artifactId>celllife-report-pconfig</artifactId>
+        </dependency>
+        
+        <!-- Jasper (included because it wasn't initially part of reports and we need it for bold fonts)-->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports-fonts</artifactId>
         </dependency>
 
         <!-- JodaTime -->

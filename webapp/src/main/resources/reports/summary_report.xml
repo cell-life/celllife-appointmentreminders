@@ -2,9 +2,9 @@
 <pconfig xmlns="http://www.cell-life.org/schemas/pconfig"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.cell-life.org/schemas/pconfig http://www.cell-life.org/schemas/pconfig/pconfig-1.0.xsd">
-	<id>message_summary_report</id>
-	<label>Message Summary Report</label>
-	<resource>message_summary_report.jasper</resource>
+	<id>summary_report</id>
+	<label>Summary Report</label>
+	<resource>summary_report.jasper</resource>
     <parameters>
       <!-- dates -->
 		<date name="start_date" label="Start date" allowFuture="false" optional="true" />

@@ -39,7 +39,7 @@
         <div class="col-md-4">
             <ul>
                 <li><a href="#message_detail_report" class="active csvReportLink">Message Detail (CSV) Report</a></li>
-                <li><a href="#message_summary_report" class="active pdfReportLink">Message Summary Report</a></li>
+                <li><a href="#summary_report" class="active pdfReportLink">Summary Report</a></li>
             </ul>
         </div>
 
